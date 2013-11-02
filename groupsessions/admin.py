@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.db import models
 
-from groupsessions.model import GroupSession
+from groupsessions.models import GroupSession
 
 class GroupSessionAdmin(admin.ModelAdmin):
 

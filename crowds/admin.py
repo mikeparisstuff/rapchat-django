@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.db import models
 
-from crowds.model import Crowd
+from crowds.models import Crowd
 
 class CrowdAdmin(admin.ModelAdmin):
 
