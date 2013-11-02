@@ -3,6 +3,7 @@ from django.contrib import admin
 
 from users import views as users_views
 from crowds import views as crowds_views
+from groupsessions import views as sessions_views
 
 admin.autodiscover()
 
@@ -24,4 +25,7 @@ urlpatterns = patterns('',
 
     # CROWDS ENDPOINTS
     url(r'^crowds/$', crowds_views.HandleCrowds.as_view(), name='handle_crowds'),
+
+    # SESSIONS ENDPOINTS
+    url(r'^sessions/$', sessions_views.HandleSessions.as_view(), name='handle_sessions'),
 )

@@ -38,3 +38,18 @@ class HandleSessions(AuthenticatedView):
 				{'error_description': 'Could not find crowd with id {}'.format(request.DATA['crowd'])},
 				status=status.HTTP_404_NOT_FOUND
 			)
+
+	def get(self, request, format=None):
+		'''
+		Return a list of sessions for the currently logged in user.
+
+		TODO: Filter the user data that gets send at this endpoint.
+		We probably don't want each users friend information to be being sent etc.
+		'''
+		user_crowds = request.user.get_profile().crowd_set.all()
+		sessions = GroupSession.objects.filter(pk__in=user_crowds)
+		serializer = GroupSessionSerializer(sessions, many=True)
+		return Response(
+			{'sessions': serializer.data},
+			status=status.HTTP_200_OK
+		)

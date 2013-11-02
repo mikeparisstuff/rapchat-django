@@ -151,6 +151,14 @@
             "created": "2013-06-27T01:12:17.572Z",
             "modified": "2013-06-27T01:12:17.572Z"
         }
+    },
+    {
+        "pk": 1,
+        "model": "groupsessions.groupsession",
+        "fields": {
+            "title": "Rap Sesh",
+            "crowd": 1
+        }
     }
 
 ]

@@ -22,4 +22,10 @@ class TestGroupSessions(APITestCase):
 			data=data
 		)
 		self.assertEqual(res.status_code, 201)
-		self.assertNotNone(res.data['session'])
+		self.assertIsNotNone(res.data['session'])
+
+	def test_get_sessions(self):
+		res = self.client.get('/sessions/')
+		print res.data
+		self.assertEqual(res.status_code, 200)
+		self.assertEqual(res.data['sessions'][0]['title'], 'Rap Sesh')

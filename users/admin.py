@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.models import User
 from django.db import models
 
-from users.models import Profile
+from users.models import Profile, FriendRequest
 
 class ProfileAdmin(admin.ModelAdmin):
 
@@ -30,4 +30,14 @@ class ProfileAdmin(admin.ModelAdmin):
 		'email'
 	)
 
+class FriendRequestAdmin(admin.ModelAdmin):
+	list_display = (
+		'id',
+		'sender',
+		'requested',
+		'is_accepted',
+		'created'
+	)
+
+admin.site.register(FriendRequest, FriendRequestAdmin)
 admin.site.register(Profile, ProfileAdmin)
