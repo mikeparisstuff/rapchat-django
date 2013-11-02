@@ -11,4 +11,4 @@ class CrowdAdmin(admin.ModelAdmin):
 		'created'
 	)
 
-admin.site.register(GroupSession, GroupSessionAdmin)
+admin.site.register(Crowd, CrowdAdmin)
