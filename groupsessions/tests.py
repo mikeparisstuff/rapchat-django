@@ -2,6 +2,7 @@ from django.test import TestCase
 from rest_framework.test import APITestCase
 from groupsessions.models import GroupSession
 from rest_framework.authtoken.models import Token
+import os
 
 class TestGroupSessions(APITestCase):
 
@@ -26,6 +27,22 @@ class TestGroupSessions(APITestCase):
 
 	def test_get_sessions(self):
 		res = self.client.get('/sessions/')
-		print res.data
 		self.assertEqual(res.status_code, 200)
 		self.assertEqual(res.data['sessions'][0]['title'], 'Rap Sesh')
+
+	def test_upload_file(self):
+		path = os.path.dirname(__file__)
+		path = os.path.join(path, 'test_upload.mp4')
+		f = open(path, 'rb')
+		data = {
+			'clip': f,
+			'session': 1,
+			'duration': 7
+		}
+		res = self.client.post(
+			'/sessions/addclip/',
+			data=data
+		)
+		print res.data
+		f.close()
+		self.assertEqual(res.status_code, 200)

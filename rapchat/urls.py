@@ -12,6 +12,7 @@ urlpatterns = patterns('',
 	url(r'api-docs/', include('rest_framework_swagger.urls')),
 
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
+    url(r'^grappelli/', include('grappelli.urls')), # grappelli URLS
     url(r'^admin/', include(admin.site.urls)),
     url(r'^$', users_views.WelcomePage.as_view(), name='welcome_page'),
 
@@ -28,4 +29,5 @@ urlpatterns = patterns('',
 
     # SESSIONS ENDPOINTS
     url(r'^sessions/$', sessions_views.HandleSessions.as_view(), name='handle_sessions'),
+    url(r'^sessions/addclip/$', sessions_views.HandleClips.as_view(), name='handle_clips'),
 )

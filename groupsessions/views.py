@@ -2,8 +2,8 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from groupsessions.models import GroupSession
-from groupsessions.serializers import GroupSessionSerializer
+from groupsessions.models import GroupSession, Clip
+from groupsessions.serializers import GroupSessionSerializer, ClipSerializer
 from crowds.models import Crowd
 from core.api import AuthenticatedView
 
@@ -53,3 +53,42 @@ class HandleSessions(AuthenticatedView):
 			{'sessions': serializer.data},
 			status=status.HTTP_200_OK
 		)
+
+class HandleClips(AuthenticatedView):
+
+	def post(self, request, format=None):
+		'''
+		Add a clip to a session.
+
+		clip (required) -- The clip file to add to the session
+		duration (required) -- The length of the clip to be added
+		session (required) -- The ID of the session to add the clip to
+		'''
+		try:
+			sesh = GroupSession.objects.get(pk=request.DATA['session'])
+			f =  request.FILES['clip']
+			c = Clip(
+				clip_num = sesh.num_clips()+1,
+				session = sesh,
+				duration = request.DATA['duration'],
+				creator = request.user.get_profile()
+			)
+			c.clip = f
+			print 'Clip Created'
+			c.save()
+			print 'Clip Saved'
+			serializer = ClipSerializer(c)
+			return Response(
+				serializer.data,
+				status=status.HTTP_200_OK
+			)
+		except KeyError:
+			return Response(
+				{'error_description': 'A clip file, duration, and session are required to add a clip'},
+				status=status.HTTP_400_BAD_REQUEST
+			)
+		except GroupSession.DoesNotExist:
+			return Response(
+				{'error_description': 'The session with id {} could not be found'.format(request.DATA['session'])},
+				status = status.HTTP_404_NOT_FOUND
+			)
