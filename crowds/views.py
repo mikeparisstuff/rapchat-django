@@ -14,10 +14,10 @@ class HandleCrowds(AuthenticatedView):
 		Create a new crowd given a list of profiles as members
 		
 		title (required) -- The title of the session
-		members (required) -- The list of profile ids to add as members
+		members (required) -- The list of usernames to add as members
 		'''
 		try:
-			profiles = Profile.objects.filter(pk__in=request.DATA.getlist('members'))
+			profiles = Profile.objects.filter(user__username__in=request.DATA.get('members'))
 			title = ''
 			if 'title' in request.DATA:
 				title = request.DATA['title']
