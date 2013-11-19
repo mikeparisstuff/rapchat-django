@@ -1,10 +1,10 @@
 from rest_framework import serializers
 from crowds.models import Crowd
-from users.serializers import ProfileSerializer
+from users.serializers import ProfileSerializerNoFriends
 
 class CrowdSerializer(serializers.ModelSerializer):
 
-	members = ProfileSerializer(many=True)
+	members = ProfileSerializerNoFriends(many=True)
 
 	class Meta:
 		model = Crowd

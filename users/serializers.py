@@ -39,6 +39,16 @@ class FriendRequestSerializer(serializers.ModelSerializer):
 			'modified'
 		)
 
+class ProfileSerializerNoFriends(serializers.ModelSerializer):
+	user = UserSerializer()
+
+	class Meta:
+		model = Profile
+		fields = (
+			'user',
+			'phone_number'
+		)
+
 class ProfileSerializer(serializers.ModelSerializer):
 
 	user = UserSerializer()

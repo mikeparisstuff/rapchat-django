@@ -30,4 +30,6 @@ urlpatterns = patterns('',
     # SESSIONS ENDPOINTS
     url(r'^sessions/$', sessions_views.HandleSessions.as_view(), name='handle_sessions'),
     url(r'^sessions/addclip/$', sessions_views.HandleClips.as_view(), name='handle_clips'),
+    url(r'^sessions/comments/$', sessions_views.HandleSessionComments.as_view(), name='handle_session_comments'),
+    url(r'^sessions/comments/(?P<session>\d+)/$', sessions_views.HandleSessionComments.as_view(), name='handle_session_comments'),
 )

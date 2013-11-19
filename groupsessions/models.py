@@ -40,6 +40,9 @@ class GroupSession(models.Model):
 	def num_clips(self):
 		return self.clip_set.count()
 
+	def get_comments(self):
+		return self.comment_set.all().order_by('-created')
+
 
 class Clip(models.Model):
 	'''
@@ -79,5 +82,63 @@ class Clip(models.Model):
 		null = True
 	)
 
-# class Resume(models.Model):
-# 	pdf = models.FileField(upload_to='pdfs')
+class Comment(models.Model):
+	'''
+	Rapchat Comment Model
+	'''
+
+	# User who made the comment
+	creator = models.ForeignKey(
+		Profile
+	)
+
+	# GroupSession being commented on
+	session = models.ForeignKey(
+		GroupSession
+	)
+
+	# Comment text
+	text = models.CharField(
+		max_length=250,
+		default = '',
+		null = False,
+		blank = False
+	)
+
+	created = models.DateTimeField(
+		auto_now_add = True,
+		blank=True,
+		null=True
+	)
+
+	modified = models.DateTimeField(
+		auto_now = True,
+		blank = True,
+		null = True
+	)
+
+class Like(models.Model):
+	'''
+	Rapchat Like Model
+	'''
+
+	# User who made the like
+	user = models.ForeignKey(
+		Profile
+	)
+
+	session = models.ForeignKey(
+		GroupSession
+	)
+
+	created = models.DateTimeField(
+		auto_now_add = True,
+		blank=True,
+		null=True
+	)
+
+	modified = models.DateTimeField(
+		auto_now = True,
+		blank = True,
+		null = True
+	)

@@ -159,6 +159,28 @@
             "title": "Rap Sesh",
             "crowd": 1
         }
+    },
+    {
+        "pk": 1,
+        "model": "groupsessions.comment",
+        "fields": {
+            "text": "This is a comment",
+            "creator": 2,
+            "session": 1,
+            "created": "2013-06-27T01:12:17.572Z",
+            "modified": "2013-06-27T01:12:17.572Z"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "groupsessions.comment",
+        "fields": {
+            "text": "This is also a comment",
+            "creator": 3,
+            "session": 1,
+            "created": "2012-06-27T01:12:17.572Z",
+            "modified": "2012-06-27T01:12:17.572Z"
+        }
     }
 
 ]

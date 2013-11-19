@@ -2,8 +2,8 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from groupsessions.models import GroupSession, Clip
-from groupsessions.serializers import GroupSessionSerializer, ClipSerializer
+from groupsessions.models import GroupSession, Clip, Comment, Like
+from groupsessions.serializers import GroupSessionSerializer, ClipSerializer, CommentSerializer
 from crowds.models import Crowd
 from core.api import AuthenticatedView
 
@@ -91,4 +91,66 @@ class HandleClips(AuthenticatedView):
 			return Response(
 				{'error_description': 'The session with id {} could not be found'.format(request.DATA['session'])},
 				status = status.HTTP_404_NOT_FOUND
+			)
+
+class HandleSessionComments(AuthenticatedView):
+	def post(self, request, format=None):
+		'''
+		Add a comment to a session.
+
+		session (required) -- The id of the session to add the comment to
+		comment_text (required) -- The text of the comment itself
+		'''
+		try:
+			sesh = GroupSession.objects.get(pk=request.DATA['session'])
+			comment = Comment.objects.create(
+				session=sesh,
+				creator=request.user.get_profile(),
+				text = request.DATA['comment_text']
+			)
+			serializer = CommentSerializer(comment)
+			return Response({
+				'comment': serializer.data,
+				'detail': 'Successfully added comment to session %d' % sesh.id
+				},
+				status=status.HTTP_200_OK
+			)
+		except KeyError:
+			return Response({
+				'error_description': 'Error creating comment. Comments need a session and comment_text.'
+				},
+				status=status.HTTP_400_BAD_REQUEST
+			)
+
+	def get(self, request, format=None, session=None):
+		'''
+		Get all of a sessions comments.
+
+		session (required) -- The id of the session. This must be included in the url e.g. /sessions/comments/1/
+		would refer to the session with id == 1.
+		'''
+		try:
+			sesh = GroupSession.objects.get(pk=session)
+			comments = sesh.get_comments()
+			# s_serializer = GroupSessionSerializer(sesh)
+			print ' Found comments'
+			c_serializer = CommentSerializer(comments, many=True)
+			print 'Serialized comments'
+			return Response({
+				'comments': c_serializer.data,
+				'detail': 'Successfully found comments for session %d' % sesh.id
+				},
+				status=status.HTTP_200_OK
+			)
+		except KeyError:
+			return Response({
+				'error_description': 'Need a session to find comments for.'
+				},
+				status=status.HTTP_400_BAD_REQUEST
+			)
+		except GroupSession.DoesNotExist:
+			return Response({
+				'error_description': 'Sorry, we could not find that session.'
+				},
+				status=status.HTTP_400_BAD_REQUEST
 			)

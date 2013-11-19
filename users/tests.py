@@ -110,7 +110,7 @@ class TestFriendRequests(APITestCase):
 		profile = User.objects.get(username='DeerDoe').get_profile()
 		friends = profile.friends
 		self.assertEqual(friends.count(), 3)
-		self.assertNotEqual(friends.get(user__username='Slappher'), None)
+		self.assertIsNotNone(friends.get(user__username='Slappher'))
 
 	def test_decline_friend_request(self):
 		data = {

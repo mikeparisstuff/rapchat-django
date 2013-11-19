@@ -1,11 +1,30 @@
 from rest_framework import serializers
-from groupsessions.models import GroupSession, Clip
+from groupsessions.models import GroupSession, Clip, Comment
 from crowds.serializers import CrowdSerializer
+
+
+class CommentSerializer(serializers.ModelSerializer):
+
+	class Meta:
+		model = Comment
+		fields = (
+			'creator',
+			'session',
+			'text',
+			'created',
+			'modified'
+		)
 
 
 class GroupSessionSerializer(serializers.ModelSerializer):
 
+	# May be a cleaner way to get this relationship
+	# TODO: investigate
+	def get_comments(self, group_session):
+		return CommentSerializer(group_session.comment_set.all(), many=True).data
+
 	crowd = CrowdSerializer()
+	comments = serializers.SerializerMethodField('get_comments')
 
 	class Meta:
 		model = GroupSession
@@ -14,6 +33,7 @@ class GroupSessionSerializer(serializers.ModelSerializer):
 			'crowd',
 			'title',
 			'is_complete',
+			'comments',
 			'created',
 			'modified'	
 		)
