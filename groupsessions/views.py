@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from groupsessions.models import GroupSession, Clip, Comment, Like
 from groupsessions.serializers import GroupSessionSerializer, ClipSerializer, CommentSerializer
 from crowds.models import Crowd
+from users.models import Profile
 from core.api import AuthenticatedView
 
 class HandleSessions(AuthenticatedView):
@@ -14,10 +15,30 @@ class HandleSessions(AuthenticatedView):
 		Create a GroupSession for the specified crowd
 
 		title (required) -- The title for the rap session
-		crowd (required) -- The id of the crowd to link the session to
+		use_existing_crowd (required) -- Boolean value. If true we will use 'crowd' else create a new crowd with 'members' and 'title'
+		crowd_title (depends) -- The title of the crowd to create and link to this session
+		crowd_members (depends) -- A list of usernames to use as members for the crowd
+		crowd (depends) -- The id of the crowd to link the session to
 		'''
 		try:
-			crowd = Crowd.objects.get(pk=request.DATA['crowd'])
+			crowd = None
+			if request.DATA['use_existing_crowd'].lower() == 'false':
+				if hasattr(request.DATA, 'getlist'):
+					usernames = request.DATA.getlist('crowd_members')
+				else:
+					usernames = request.DATA.get('crowd_members')
+				profiles = Profile.objects.filter(user__username__in=usernames)
+				title = ''
+				if 'crowd_title' in request.DATA:
+					title = request.DATA['crowd_title']
+				crowd = Crowd.objects.create(
+					title = title
+				)
+				for item in profiles.all():
+					crowd.members.add(item)
+				crowd.members.add(request.user.get_profile())
+			if crowd is None:
+				crowd = Crowd.objects.get(pk=request.DATA['crowd'])
 			title = request.DATA['title']
 			gs = GroupSession.objects.create(
 				crowd = crowd,
@@ -28,6 +49,8 @@ class HandleSessions(AuthenticatedView):
 				{'session': serializer.data},
 				status=status.HTTP_201_CREATED
 			)
+
+
 		except KeyError:
 			return Response(
 				{'error_description': 'New sessions require a title and crowd'},

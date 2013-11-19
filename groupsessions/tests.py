@@ -16,6 +16,7 @@ class TestGroupSessions(APITestCase):
 	def test_create_session_valid_info(self):
 		data = {
 			'title': 'Rap Session Title',
+			'use_existing_crowd': True,
 			'crowd': 1
 		}		
 		res = self.client.post(
@@ -24,6 +25,23 @@ class TestGroupSessions(APITestCase):
 		)
 		self.assertEqual(res.status_code, 201)
 		self.assertIsNotNone(res.data['session'])
+
+	def test_create_session_create_crowd(self):
+		data = {
+			'title': 'Group Session',
+			'use_existing_crowd': False,
+			'crowd_title': 'Crowd Title Wooooh',
+			'crowd_members': ['WhoAmI', 'Superrhymes']
+		}
+		res = self.client.post(
+			'/sessions/',
+			data = data
+		)
+		self.assertEqual(res.status_code, 201)
+		self.assertIsNotNone(res.data['session'])
+		self.assertEqual(len(res.data['session']['crowd']['members']), 3)
+		self.assertEqual(res.data['session']['crowd']['title'], 'Crowd Title Wooooh')
+
 
 	def test_get_sessions(self):
 		res = self.client.get('/sessions/')
@@ -50,7 +68,6 @@ class TestGroupSessions(APITestCase):
 	def test_get_comments(self):
 		data = {'session': 1}
 		res = self.client.get('/sessions/comments/1/')
-		print res.data
 		self.assertEqual(res.status_code, 200)
 		self.assertIsNotNone(res.data['comments'])
 		self.assertEqual(len(res.data['comments']), 2)
