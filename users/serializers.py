@@ -45,6 +45,7 @@ class ProfileSerializerNoFriends(serializers.ModelSerializer):
 	class Meta:
 		model = Profile
 		fields = (
+			'id',
 			'user',
 			'phone_number'
 		)
@@ -56,6 +57,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Profile
 		fields = (
+			'id',
 			'user',
 			'friends',
 			'phone_number'

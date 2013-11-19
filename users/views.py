@@ -8,7 +8,7 @@ from rest_framework.authtoken.models import Token
 
 from django.contrib.auth.models import User
 from users.models import Profile, FriendRequest
-from users.serializers import ProfileSerializer, UserSerializer, FriendRequestSerializer
+from users.serializers import ProfileSerializer, UserSerializer, FriendRequestSerializer, ProfileSerializerNoFriends
 from core.api import AuthenticatedView
 
 class WelcomePage(APIView):
@@ -177,7 +177,7 @@ class HandleFriends(AuthenticatedView):
 		'''
 		profile = request.user.get_profile()
 		friends = profile.friends.all()
-		serializer = ProfileSerializer(friends, many=True)
+		serializer = ProfileSerializerNoFriends(friends, many=True)
 		return Response(
 			{"friends": serializer.data},
 			status=status.HTTP_200_OK
