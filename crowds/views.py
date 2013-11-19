@@ -17,7 +17,11 @@ class HandleCrowds(AuthenticatedView):
 		members (required) -- The list of usernames to add as members
 		'''
 		try:
-			profiles = Profile.objects.filter(user__username__in=request.DATA.get('members'))
+			if hasattr(request.DATA, 'getlist'):
+				usernames = request.DATA.getlist('members')
+			else:
+				usernames = request.DATA.get('members')
+			profiles = Profile.objects.filter(user__username__in=usernames)
 			title = ''
 			if 'title' in request.DATA:
 				title = request.DATA['title']

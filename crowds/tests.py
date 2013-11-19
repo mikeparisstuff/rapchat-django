@@ -22,12 +22,13 @@ class TestCrowds(APITestCase):
 	def test_create_crowd_valid_info(self):
 		data = {
 			'title': 'Cha Boys',
-			'members': [1,3]
+			'members': ["WhoAmI","Superrhymes"]
 		}
 		res = self.client.post(
 			'/crowds/',
 			data=data
 		)
+		print res.data
 		self.assertEqual(res.status_code, 201)
 		self.assertEqual(res.data['crowd']['title'], 'Cha Boys')
 		self.assertEqual(len(res.data['crowd']['members']), 3)
