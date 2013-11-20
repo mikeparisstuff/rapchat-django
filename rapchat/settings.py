@@ -167,7 +167,7 @@ TEMPLATE_DIRS = (
 REST_FRAMEWORK = {
     'DEFAULT_PARSER_CLASSES': (
         'rest_framework.parsers.JSONParser',
-        # 'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.FormParser',
         # 'rest_framework.parsers.MultiPartParser',
         'rest_framework.parsers.FileUploadParser'
     ),

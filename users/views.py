@@ -91,12 +91,14 @@ class HandleFriendRequests(AuthenticatedView):
 		'''
 		try:
 			requested = User.objects.get(username=request.DATA['username'])
-			FriendRequest.objects.create(
+			f = FriendRequest.objects.create(
 				sender = request.user,
 				requested = requested
 			)
+			serializer = FriendRequestSerializer(f)
 			return Response(
-				{'detail': 'Successfully sent a request to {}'.format(requested)},
+				{'detail': 'Successfully sent a request to {}'.format(requested),
+				 'request': serializer.data},
 				status=status.HTTP_201_CREATED
 			)
 		except KeyError:

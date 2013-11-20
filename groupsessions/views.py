@@ -22,7 +22,8 @@ class HandleSessions(AuthenticatedView):
 		'''
 		try:
 			crowd = None
-			if request.DATA['use_existing_crowd'].lower() == 'false':
+			print request.DATA
+			if not request.DATA['use_existing_crowd']:
 				if hasattr(request.DATA, 'getlist'):
 					usernames = request.DATA.getlist('crowd_members')
 				else:
