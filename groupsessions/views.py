@@ -22,12 +22,8 @@ class HandleSessions(AuthenticatedView):
 		'''
 		try:
 			crowd = None
-			print request.DATA
 			if not request.DATA['use_existing_crowd']:
-				if hasattr(request.DATA, 'getlist'):
-					usernames = request.DATA.getlist('crowd_members')
-				else:
-					usernames = request.DATA.get('crowd_members')
+				usernames = request.DATA['crowd_members']
 				profiles = Profile.objects.filter(user__username__in=usernames)
 				title = ''
 				if 'crowd_title' in request.DATA:
