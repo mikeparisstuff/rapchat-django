@@ -24,6 +24,7 @@ class HandleSessions(AuthenticatedView):
 			crowd = None
 			if not request.DATA['use_existing_crowd']:
 				usernames = request.DATA['crowd_members']
+				print 'USERNAMES: {}'.format(usernames)
 				profiles = Profile.objects.filter(user__username__in=usernames)
 				title = ''
 				if 'crowd_title' in request.DATA:

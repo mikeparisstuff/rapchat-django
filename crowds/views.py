@@ -18,6 +18,7 @@ class HandleCrowds(AuthenticatedView):
 		'''
 		try:
 			usernames = request.DATA['members']
+			print 'USERNAMES: {}'.format(usernames)
 			profiles = Profile.objects.filter(user__username__in=usernames)
 			title = ''
 			if 'title' in request.DATA:
