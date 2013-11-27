@@ -141,7 +141,7 @@ class HandleFriendRequestReplies(AuthenticatedView):
 			sender = sender.get_profile()
 			me = request.user.get_profile()
 			accepted = request.DATA['accepted']
-			if accepted == 'True':
+			if accepted:
 				me.accept_friend_request(sender)
 				return Response(
 					{
