@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.db import models
 
-from groupsessions.models import GroupSession
+from groupsessions.models import GroupSession, Clip
 
 class GroupSessionAdmin(admin.ModelAdmin):
 
@@ -13,4 +13,14 @@ class GroupSessionAdmin(admin.ModelAdmin):
 		'created'
 	)
 
+class ClipAdmin(admin.ModelAdmin):
+	list_display = (
+		'id',
+		'creator',
+		'session',
+		'clip_num',
+		'duration'
+	)
+
 admin.site.register(GroupSession, GroupSessionAdmin)
+admin.site.register(Clip, ClipAdmin)

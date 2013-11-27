@@ -12,8 +12,6 @@ class UserSerializer(serializers.ModelSerializer):
 		model = User
 		read_only_fields = (
 			'id',
-			'username',
-			'date_joined'
 		)
 		fields = (
 			'id',
@@ -61,7 +59,4 @@ class ProfileSerializer(serializers.ModelSerializer):
 			'user',
 			'friends',
 			'phone_number'
-		)
-		read_only_fields = (
-			'phone_number',
 		)

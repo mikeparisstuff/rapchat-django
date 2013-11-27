@@ -21,7 +21,9 @@ class GroupSessionSerializer(serializers.ModelSerializer):
 	# May be a cleaner way to get this relationship
 	# TODO: investigate
 	def get_comments(self, group_session):
-		return CommentSerializer(group_session.comment_set.all(), many=True).data
+		if group_session:
+			return CommentSerializer(group_session.comment_set.all(), many=True).data
+		return None
 
 	crowd = CrowdSerializer()
 	comments = serializers.SerializerMethodField('get_comments')
