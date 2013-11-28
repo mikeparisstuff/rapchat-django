@@ -9,6 +9,7 @@ class CrowdSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Crowd
 		fields = (
+			'id',
 			'title',
 			'members',
 			'created',
