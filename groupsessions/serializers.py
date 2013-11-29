@@ -50,7 +50,6 @@ class ClipSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Clip
 		fields = (
-			'duration',
 			'clip',
 			'url',
 			'clip_num',

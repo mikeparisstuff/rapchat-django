@@ -19,7 +19,6 @@ class ClipAdmin(admin.ModelAdmin):
 		'creator',
 		'session',
 		'clip_num',
-		'duration'
 	)
 
 admin.site.register(GroupSession, GroupSessionAdmin)
