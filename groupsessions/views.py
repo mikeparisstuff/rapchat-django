@@ -16,6 +16,7 @@ class HandleSessions(AuthenticatedView):
 
 		title (required) -- The title for the rap session
 		use_existing_crowd (required) -- Boolean value. If true we will use 'crowd' else create a new crowd with 'members' and 'title'
+		clip (required) -- File. A file holding the clip to be added to the new session
 		crowd_title (depends) -- The title of the crowd to create and link to this session
 		crowd_members (depends) -- A list of usernames to use as members for the crowd
 		crowd (depends) -- The id of the crowd to link the session to
@@ -41,8 +42,22 @@ class HandleSessions(AuthenticatedView):
 			gs = GroupSession.objects.create(
 				crowd = crowd,
 				title = title
+			)		
+
+			# Create a new clip for the newly created session
+			f =  request.FILES['clip']
+			c = Clip(
+				clip_num = gs.num_clips()+1,
+				session = gs,
+				creator = request.user.get_profile()
 			)
+			c.clip = f
+			print 'Clip Created'
+			c.save()
+			print 'Clip Saved'
+
 			serializer = GroupSessionSerializer(gs)
+
 			return Response(
 				{'session': serializer.data},
 				status=status.HTTP_201_CREATED
@@ -82,7 +97,6 @@ class HandleClips(AuthenticatedView):
 		Add a clip to a session.
 
 		clip (required) -- The clip file to add to the session
-		duration (required) -- The length of the clip to be added
 		session (required) -- The ID of the session to add the clip to
 		'''
 		try:
@@ -91,7 +105,6 @@ class HandleClips(AuthenticatedView):
 			c = Clip(
 				clip_num = sesh.num_clips()+1,
 				session = sesh,
-				duration = request.DATA['duration'],
 				creator = request.user.get_profile()
 			)
 			c.clip = f

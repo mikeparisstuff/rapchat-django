@@ -49,7 +49,7 @@ class Clip(models.Model):
 	Rapchat Music Clip
 	'''
 
-	duration = models.IntegerField()
+	# duration = models.IntegerField()
 
 	clip_num = models.IntegerField(
 		default = 1
