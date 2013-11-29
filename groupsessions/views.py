@@ -23,7 +23,11 @@ class HandleSessions(AuthenticatedView):
 		'''
 		try:
 			crowd = None
-			if not request.DATA['use_existing_crowd']:
+			use_existing = request.DATA['use_existing_crowd']
+			if not isinstance(request.DATA['use_existing_crowd'], bool):
+				# The param is a string not a boolean
+				use_existing = False if request.DATA['use_existing_crowd'].lower() == 'false' else True
+			if not use_existing: 
 				usernames = request.DATA['crowd_members']
 				print 'USERNAMES: {}'.format(usernames)
 				profiles = Profile.objects.filter(user__username__in=usernames)
