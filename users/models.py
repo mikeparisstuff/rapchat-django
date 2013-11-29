@@ -33,11 +33,11 @@ class Profile(models.Model):
 		return Token.objects.get(user=self.user)
 
 	def friend_requests_pending_my_response(self):
-		requests = FriendRequest.objects.filter(requested=self.user).all()
+		requests = FriendRequest.objects.filter(requested=self.user, is_accepted=False).all()
 		return [elem.sender for elem in requests]
 
 	def friend_requests_pending_their_response(self):
-		requests = FriendRequest.objects.filter(sender=self.user).all()
+		requests = FriendRequest.objects.filter(sender=self.user, is_accepted=False).all()
 		return [elem.requested for elem in requests]
 
 	def send_friend_request(self, requested):
