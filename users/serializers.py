@@ -19,7 +19,8 @@ class UserSerializer(serializers.ModelSerializer):
 			'last_name',
 			'email',
 			'username',
-			'date_joined'
+			'date_joined',
+			'last_login'
 		)
 
 class FriendRequestSerializer(serializers.ModelSerializer):

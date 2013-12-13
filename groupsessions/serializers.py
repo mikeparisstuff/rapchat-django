@@ -1,6 +1,7 @@
 from rest_framework import serializers
-from groupsessions.models import GroupSession, Clip, Comment
+from groupsessions.models import GroupSession, Clip, Comment, Like
 from crowds.serializers import CrowdSerializer
+from users.serializers import ProfileSerializer
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -25,8 +26,15 @@ class GroupSessionSerializer(serializers.ModelSerializer):
 			return CommentSerializer(group_session.comment_set.all(), many=True).data
 		return None
 
+	def get_likes(self, group_session):
+		if group_session:
+			return group_session.like_set.all().count()
+		return None
+
+
 	crowd = CrowdSerializer()
 	comments = serializers.SerializerMethodField('get_comments')
+	likes = serializers.SerializerMethodField('get_likes')
 
 	class Meta:
 		model = GroupSession
@@ -36,6 +44,7 @@ class GroupSessionSerializer(serializers.ModelSerializer):
 			'title',
 			'is_complete',
 			'comments',
+			'likes',
 			'created',
 			'modified'	
 		)
@@ -54,6 +63,20 @@ class ClipSerializer(serializers.ModelSerializer):
 			'url',
 			'clip_num',
 			'creator',
+			'session',
+			'created',
+			'modified'
+		)
+
+class LikeSerializer(serializers.ModelSerializer):
+
+	user = ProfileSerializer()
+	username = serializers.Field(source='user.user.username')
+
+	class Meta:
+		model = Like
+		fields = (
+			'username',
 			'session',
 			'created',
 			'modified'

@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from groupsessions.models import GroupSession, Clip, Comment, Like
-from groupsessions.serializers import GroupSessionSerializer, ClipSerializer, CommentSerializer
+from groupsessions.serializers import GroupSessionSerializer, ClipSerializer, CommentSerializer, LikeSerializer
 from crowds.models import Crowd
 from users.models import Profile
 from core.api import AuthenticatedView
@@ -122,7 +122,7 @@ class HandleClips(AuthenticatedView):
 			)
 		except KeyError:
 			return Response(
-				{'error_description': 'A clip file, duration, and session are required to add a clip'},
+				{'error_description': 'A clip file and session are required to add a clip'},
 				status=status.HTTP_400_BAD_REQUEST
 			)
 		except GroupSession.DoesNotExist:
@@ -192,3 +192,25 @@ class HandleSessionComments(AuthenticatedView):
 				},
 				status=status.HTTP_400_BAD_REQUEST
 			)
+
+class HandleSessionLikes(AuthenticatedView):
+	def post(self, request, format=None):
+		'''
+		Add a like to a session
+
+		session (required) -- The id of the session to add the comment to
+		'''
+		try:
+			serializer = LikeSerializer(data={'user': request.user.get_profile().id, 
+											'session': request.DATA['session']})
+			if serializer.is_valid():
+				serializer.save()
+				return Response(serializer.data, status=status.HTTP_200_OK)
+			print 'Error deserializing object'
+			print serializer.object
+			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+		except KeyError:
+			return Response({
+				'detail': 'Failed to create like'},
+				status = status.HTTP_400_BAD_REQUEST
+				)

@@ -37,6 +37,9 @@ class GroupSession(models.Model):
 		null = True
 	)
 
+	def num_likes(self):
+		return self.like_set.count()
+
 	def num_clips(self):
 		return self.clip_set.count()
 

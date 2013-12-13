@@ -81,6 +81,19 @@ class HandleUsers(APIView):
 		serializer = ProfileSerializer(profiles, many=True)
 		return Response(serializer.data, status=status.HTTP_200_OK)
 
+class HandleMyProfile(AuthenticatedView):
+
+	def get(self, request, format=None):
+		'''
+		Get my profile.
+		'''
+		me = Profile.objects.get(user__username = request.user.username)
+		serializer = ProfileSerializer(me)
+		return Response(
+			serializer.data,
+			status=status.HTTP_200_OK
+		)
+
 class HandleFriendRequests(AuthenticatedView):
 
 	def post(self, request, format=None):
