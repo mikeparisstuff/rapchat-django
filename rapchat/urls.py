@@ -21,9 +21,9 @@ urlpatterns = patterns('',
     url(r'^users/me/$', users_views.HandleMyProfile.as_view(), name='get_my_user'),
     url(r'^users/obtain-token/$', 'rest_framework.authtoken.views.obtain_auth_token'),
 
-    url(r'^friends/$', users_views.HandleFriends.as_view(), name='handle_friends'),
-    url(r'^friends/requests/$', users_views.HandleFriendRequests.as_view(), name='handle_friend_requests'),
-    url(r'^friends/requests/reply/$', users_views.HandleFriendRequestReplies.as_view(), name='handle_friend_request_replies'),
+    url(r'^users/friends/$', users_views.HandleFriends.as_view(), name='handle_friends'),
+    url(r'^users/friends/requests/$', users_views.HandleFriendRequests.as_view(), name='handle_friend_requests'),
+    url(r'^users/friends/requests/reply/$', users_views.HandleFriendRequestReplies.as_view(), name='handle_friend_request_replies'),
 
     # CROWDS ENDPOINTS
     url(r'^crowds/$', crowds_views.HandleCrowds.as_view(), name='handle_crowds'),
