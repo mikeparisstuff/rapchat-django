@@ -1,6 +1,8 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 
+from rest_framework import routers
+
 from users import views as users_views
 from crowds import views as crowds_views
 from groupsessions import views as sessions_views

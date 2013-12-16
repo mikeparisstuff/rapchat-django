@@ -52,6 +52,8 @@ class ProfileSerializerNoFriends(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
 
 	user = UserSerializer()
+	# Give nested information for friends
+	friends = ProfileSerializerNoFriends(many=True)
 
 	class Meta:
 		model = Profile

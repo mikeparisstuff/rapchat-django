@@ -47,6 +47,7 @@ class GroupSession(models.Model):
 		return self.comment_set.all().order_by('-created')
 
 
+
 class Clip(models.Model):
 	'''
 	Rapchat Music Clip
