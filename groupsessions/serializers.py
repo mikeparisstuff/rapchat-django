@@ -77,6 +77,7 @@ class LikeSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Like
 		fields = (
+			'id',
 			'username',
 			'session',
 			'created',
