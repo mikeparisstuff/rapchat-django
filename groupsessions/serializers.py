@@ -6,10 +6,13 @@ from users.serializers import ProfileSerializer
 
 class CommentSerializer(serializers.ModelSerializer):
 
+	commenter = serializers.Field(source='creator.user.username')
+
 	class Meta:
 		model = Comment
 		fields = (
-			'creator',
+			'id',
+			'commenter',
 			'session',
 			'text',
 			'created',
