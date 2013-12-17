@@ -21,6 +21,7 @@ urlpatterns = patterns('',
     # USER ENDPOINTS
     url(r'^users/$', users_views.HandleUsers.as_view(), name='create_new_user'),
     url(r'^users/me/$', users_views.HandleMyProfile.as_view(), name='get_my_user'),
+    url(r'^users/me/likes/$', sessions_views.HandleSessionLikes.as_view(), name='get_my_likes'),
     url(r'^users/obtain-token/$', 'rest_framework.authtoken.views.obtain_auth_token'),
 
     url(r'^users/friends/$', users_views.HandleFriends.as_view(), name='handle_friends'),
@@ -35,5 +36,5 @@ urlpatterns = patterns('',
     url(r'^sessions/addclip/$', sessions_views.HandleClips.as_view(), name='handle_clips'),
     url(r'^sessions/comments/$', sessions_views.HandleSessionComments.as_view(), name='handle_session_comments'),
     url(r'^sessions/comments/(?P<session>\d+)/$', sessions_views.HandleSessionComments.as_view(), name='handle_session_comments'),
-    url(r'^sessions/likes/$', sessions_views.HandleSessionLikes.as_view(), name='handle_likes'),
+    # url(r'^sessions/likes/$', sessions_views.HandleSessionLikes.as_view(), name='handle_likes'),
 )

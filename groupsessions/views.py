@@ -201,16 +201,36 @@ class HandleSessionLikes(AuthenticatedView):
 		session (required) -- The id of the session to add the comment to
 		'''
 		try:
-			serializer = LikeSerializer(data={'user': request.user.get_profile().id, 
-											'session': request.DATA['session']})
-			if serializer.is_valid():
-				serializer.save()
-				return Response(serializer.data, status=status.HTTP_200_OK)
-			print 'Error deserializing object'
-			print serializer.object
-			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+			session = GroupSession.objects.get(id=request.DATA['session'])
+			like = Like.objects.create(
+				user= request.user.get_profile(),
+				session= session
+			)
+			serializer = LikeSerializer(like)
+			return Response({
+				'like': serializer.data
+				},
+				status=status.HTTP_201_CREATED
+			)
 		except KeyError:
 			return Response({
 				'detail': 'Failed to create like'},
 				status = status.HTTP_400_BAD_REQUEST
 				)
+
+	def get(self, request, format=None):
+		'''
+		Get all the likes for the currently logged in user
+		'''
+		likes = request.user.get_profile().get_likes()
+		serializer = None
+		if len(likes) > 1:
+			serializer = LikeSerializer(data=likes, many=True)
+		else:
+			serializer = LikeSerializer(data=likes)
+		print serializer.data
+		return Response({
+			'likes': serializer.data
+			},
+			status = status.HTTP_200_OK
+		)	

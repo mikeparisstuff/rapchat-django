@@ -63,6 +63,9 @@ class Profile(models.Model):
 		)
 		request.delete()
 
+	def get_likes(self):
+		return self.like_set.all().order_by('-created')
+
 
 
 class FriendRequest(models.Model):
