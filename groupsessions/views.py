@@ -223,12 +223,12 @@ class HandleSessionLikes(AuthenticatedView):
 		Get all the likes for the currently logged in user
 		'''
 		likes = request.user.get_profile().get_likes()
+		print likes
 		serializer = None
 		if len(likes) > 1:
-			serializer = LikeSerializer(data=likes, many=True)
+			serializer = LikeSerializer(likes, many=True)
 		else:
-			serializer = LikeSerializer(data=likes)
-		print serializer.data
+			serializer = LikeSerializer(likes)
 		return Response({
 			'likes': serializer.data
 			},
