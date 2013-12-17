@@ -202,6 +202,16 @@ class HandleSessionLikes(AuthenticatedView):
 		'''
 		try:
 			session = GroupSession.objects.get(id=request.DATA['session'])
+			like = Like.objects.get(
+				user = request.user.get_profile(),
+				session= session
+			)
+			like.delete()
+			return Response({
+				'detail': 'Successfully deleted like'
+				}, status=status.HTTP_200_OK
+			)
+		except Like.DoesNotExist:
 			like = Like.objects.create(
 				user= request.user.get_profile(),
 				session= session
