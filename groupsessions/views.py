@@ -208,7 +208,7 @@ class HandleSessionLikes(AuthenticatedView):
 			)
 			like.delete()
 			return Response({
-				'detail': 'Successfully deleted like'
+				'like': {'detail': 'Successfully deleted like'}
 				}, status=status.HTTP_200_OK
 			)
 		except Like.DoesNotExist:
