@@ -94,17 +94,32 @@ class HandleSessions(AuthenticatedView):
 			status=status.HTTP_200_OK
 		)
 
+class HandleSession(AuthenticatedView):
+
+	def get(self, request, format=None, session=None):
+		'''
+		Return a single session as designated by the id in the URL
+		'''
+		try:
+			sesh = GroupSession.objects.get(pk=session)
+			serializer = GroupSessionSerializer(sesh)
+			return Response(serializer.data, status=status.HTTP_200_OK)
+		except GroupSession.DoesNotExist:
+			return Response({
+				'error_description': 'Could not find a session with that id.'
+				}, status=status.HTTP_400_BAD_REQUEST
+			)
+
 class HandleClips(AuthenticatedView):
 
-	def post(self, request, format=None):
+	def post(self, request, format=None, session=None):
 		'''
 		Add a clip to a session.
 
 		clip (required) -- The clip file to add to the session
-		session (required) -- The ID of the session to add the clip to
 		'''
 		try:
-			sesh = GroupSession.objects.get(pk=request.DATA['session'])
+			sesh = GroupSession.objects.get(pk=session)
 			f =  request.FILES['clip']
 			c = Clip(
 				clip_num = sesh.num_clips()+1,
@@ -131,20 +146,33 @@ class HandleClips(AuthenticatedView):
 				status = status.HTTP_404_NOT_FOUND
 			)
 
+	def get(self, request, format=None, session=None):
+		'''
+		Return data on each of the clips for the session specified in the url.
+		'''
+		try:
+			clips = Clip.objects.filter(session=session)
+			serializer = ClipSerializer(clips, many=True)
+			return Response(serializer.data, status=status.HTTP_200_OK)
+		except Clip.DoesNotExist:
+			return Response({
+				'error_description': 'Could not find any clips for session {}'.format(session)
+				}, status=status.HTTP_400_BAD_REQUEST
+			)
+
 class HandleSessionComments(AuthenticatedView):
-	def post(self, request, format=None):
+	def post(self, request, format=None, session=None):
 		'''
 		Add a comment to a session.
 
-		session (required) -- The id of the session to add the comment to
-		comment_text (required) -- The text of the comment itself
+		text (required) -- The text of the comment itself
 		'''
 		try:
-			sesh = GroupSession.objects.get(pk=request.DATA['session'])
+			sesh = GroupSession.objects.get(pk=session)
 			comment = Comment.objects.create(
 				session=sesh,
 				creator=request.user.get_profile(),
-				text = request.DATA['comment_text']
+				text = request.DATA['text']
 			)
 			serializer = CommentSerializer(comment)
 			return Response({
