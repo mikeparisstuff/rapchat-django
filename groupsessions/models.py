@@ -44,7 +44,7 @@ class GroupSession(models.Model):
 		return self.clip_set.count()
 
 	def get_comments(self):
-		return self.comment_set.all().order_by('-created')
+		return self.comment_set.all().order_by('created')
 
 
 
