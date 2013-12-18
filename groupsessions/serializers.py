@@ -34,10 +34,19 @@ class GroupSessionSerializer(serializers.ModelSerializer):
 			return group_session.like_set.all().count()
 		return None
 
+	def get_most_recent_url(self, group_session):
+		if group_session:
+			clip = group_session.most_recent_clip()
+			if clip:
+				return clip.clip.url
+			return None
+		return None
+
 
 	crowd = CrowdSerializer()
 	comments = serializers.SerializerMethodField('get_comments')
 	likes = serializers.SerializerMethodField('get_likes')
+	clip_url = serializers.SerializerMethodField('get_most_recent_url')
 
 	class Meta:
 		model = GroupSession
@@ -48,6 +57,7 @@ class GroupSessionSerializer(serializers.ModelSerializer):
 			'is_complete',
 			'comments',
 			'likes',
+			'clip_url',
 			'created',
 			'modified'	
 		)
