@@ -20,6 +20,7 @@ class HandleCrowds(AuthenticatedView):
 			usernames = request.DATA['members']
 			print 'USERNAMES: {}'.format(usernames)
 			profiles = Profile.objects.filter(user__username__in=usernames)
+			print 'PROFILES: {}'.format(profiles)
 			title = ''
 			if 'title' in request.DATA:
 				title = request.DATA['title']
@@ -29,6 +30,7 @@ class HandleCrowds(AuthenticatedView):
 			for item in profiles.all():
 				c.members.add(item)
 			c.members.add(request.user.get_profile())
+			print 'New Crowd Members: {}'.format(c.members)
 			serializer = CrowdSerializer(c)
 			return Response(
 				{'detail': 'Successfully created new crowd',
