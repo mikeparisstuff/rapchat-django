@@ -26,7 +26,7 @@ class GroupSessionSerializer(serializers.ModelSerializer):
 	# TODO: investigate
 	def get_comments(self, group_session):
 		if group_session:
-			return CommentSerializer(group_session.comment_set.all(), many=True).data
+			return CommentSerializer(group_session.get_comments(), many=True).data
 		return None
 
 	def get_likes(self, group_session):
