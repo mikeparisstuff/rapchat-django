@@ -46,7 +46,10 @@ class GroupSessionSerializer(serializers.ModelSerializer):
 		if group_session:
 			clip = group_session.most_recent_clip()
 			if clip:
-				return clip.thumbnail.url
+				try:
+					return clip.thumbnail.url
+				except ValueError:
+					return None
 			return None
 		return None
 
