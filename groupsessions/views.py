@@ -117,6 +117,7 @@ class HandleClips(AuthenticatedView):
 		Add a clip to a session.
 
 		clip (required) -- The clip file to add to the session
+		thumbnail (required)  -- A jpg image file to serve as a thumbnail for the clip
 		'''
 		try:
 			sesh = GroupSession.objects.get(pk=session)
