@@ -121,12 +121,16 @@ class HandleClips(AuthenticatedView):
 		try:
 			sesh = GroupSession.objects.get(pk=session)
 			f =  request.FILES['clip']
+			thumbnail = None
 			c = Clip(
 				clip_num = sesh.num_clips()+1,
 				session = sesh,
 				creator = request.user.get_profile()
 			)
 			c.clip = f
+			if 'thumbnail' in request.FILES:
+				thumbnail = request.FILES['thumbnail']
+				c.thumbnail = thumbnail
 			print 'Clip Created'
 			c.save()
 			print 'Clip Saved'

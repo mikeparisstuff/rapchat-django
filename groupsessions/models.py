@@ -73,11 +73,20 @@ class Clip(models.Model):
 		GroupSession
 	)
 	
-	def get_upload_path(self, filename):
+	def get_clip_upload_path(self, filename):
 		return 'sessions/session_{}/clip_{}.mp4'.format(self.session.id, self.clip_num)
 
+	def get_thumbnail_upload_path(self, filename):
+		return 'sessions/session_{}/thumbnail_{}.jpg'.format(self.session.id, self.clip_num)
+
 	clip = models.FileField(
-		upload_to=get_upload_path
+		upload_to=get_clip_upload_path
+	)
+
+	thumbnail = models.FileField(
+		upload_to=get_thumbnail_upload_path,
+		null = True,
+		blank = True
 	)
 
 	created = models.DateTimeField(
