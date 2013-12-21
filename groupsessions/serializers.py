@@ -43,12 +43,12 @@ class GroupSessionSerializer(serializers.ModelSerializer):
 		return None
 
 	def get_most_recent_thumbnail_url(self, group_session):
-	if group_session:
-		clip = group_session.most_recent_clip()
-		if clip:
-			return clip.thumbnail.url
+		if group_session:
+			clip = group_session.most_recent_clip()
+			if clip:
+				return clip.thumbnail.url
+			return None
 		return None
-	return None
 
 
 	crowd = CrowdSerializer()
