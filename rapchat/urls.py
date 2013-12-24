@@ -29,7 +29,7 @@ urlpatterns = patterns('',
     url(r'^users/friends/requests/reply/$', users_views.HandleFriendRequestReplies.as_view(), name='handle_friend_request_replies'),
 
     # CROWDS ENDPOINTS
-    url(r'^crowds/$', crowds_views.HandleCrowds.as_view(), name='handle_crowds'),
+    url(r'^users/me/crowds/$', crowds_views.HandleCrowds.as_view(), name='handle_crowds'),
 
     # SESSIONS ENDPOINTS
     url(r'^sessions/$', sessions_views.HandleSessions.as_view(), name='handle_sessions'),
