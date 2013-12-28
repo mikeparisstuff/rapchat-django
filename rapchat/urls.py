@@ -24,15 +24,15 @@ urlpatterns = patterns('',
     url(r'^users/me/likes/$', sessions_views.HandleSessionLikes.as_view(), name='get_my_likes'),
     url(r'^users/obtain-token/$', 'rest_framework.authtoken.views.obtain_auth_token'),
 
-    url(r'^users/friends/$', users_views.HandleFriends.as_view(), name='handle_friends'),
-    url(r'^users/friends/requests/$', users_views.HandleFriendRequests.as_view(), name='handle_friend_requests'),
-    url(r'^users/friends/requests/reply/$', users_views.HandleFriendRequestReplies.as_view(), name='handle_friend_request_replies'),
+    url(r'^users/me/friends/$', users_views.HandleFriends.as_view(), name='handle_friends'),
+    url(r'^users/me/friends/requests/$', users_views.HandleFriendRequests.as_view(), name='handle_friend_requests'),
+    url(r'^users/me/friends/requests/reply/$', users_views.HandleFriendRequestReplies.as_view(), name='handle_friend_request_replies'),
 
     # CROWDS ENDPOINTS
     url(r'^users/me/crowds/$', crowds_views.HandleCrowds.as_view(), name='handle_crowds'),
 
     # SESSIONS ENDPOINTS
-    url(r'^sessions/$', sessions_views.HandleSessions.as_view(), name='handle_sessions'),
+    url(r'^users/me/sessions/$', sessions_views.HandleSessions.as_view(), name='handle_sessions'),
     url(r'^sessions/(?P<session>\d+)/$', sessions_views.HandleSession.as_view(), name='handle_single_session'),
     url(r'^sessions/(?P<session>\d+)/clips/$', sessions_views.HandleClips.as_view(), name='handle_clips'),
     url(r'^sessions/(?P<session>\d+)/comments/$', sessions_views.HandleSessionComments.as_view(), name='handle_session_comments'),
