@@ -94,7 +94,7 @@ class HandleSessions(AuthenticatedView):
 		We probably don't want each users friend information to be being sent etc.
 		'''
 		user_crowds = request.user.get_profile().crowd_set.all()
-		sessions = GroupSession.objects.filter(crowd__in=user_crowds)
+		sessions = GroupSession.objects.filter(crowd__in=user_crowds).order_by('-modified')
 		serializer = GroupSessionSerializer(sessions, many=True)
 		return Response(
 			{'sessions': serializer.data},
