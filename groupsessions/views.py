@@ -50,11 +50,15 @@ class HandleSessions(AuthenticatedView):
 
 			# Create a new clip for the newly created session
 			f =  request.FILES['clip']
+			thumbnail = None
 			c = Clip(
 				clip_num = gs.num_clips()+1,
 				session = gs,
 				creator = request.user.get_profile()
 			)
+			if 'thumbnail' in request.FILES:
+				thumbnail = request.FILES['thumbnail']
+				c.thumbnail = thumbnail
 			c.clip = f
 			print 'Clip Created'
 			c.save()
@@ -117,7 +121,7 @@ class HandleClips(AuthenticatedView):
 		Add a clip to a session.
 
 		clip (required) -- The clip file to add to the session
-		thumbnail (required)  -- A jpg image file to serve as a thumbnail for the clip
+		thumbnail (required)  -- A jpg image file to serve as a thumbnail for the clipg
 		'''
 		try:
 			sesh = GroupSession.objects.get(pk=session)
