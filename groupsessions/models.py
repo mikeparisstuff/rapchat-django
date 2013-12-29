@@ -108,7 +108,7 @@ class Clip(models.Model):
 	)
 
 @receiver(post_save, sender=Clip)
-def create_auth_token(sender, instance=None, created=False, **kwargs):
+def update_session_modified_timestamp(sender, instance=None, created=False, **kwargs):
 	if created and instance:
 		instance.session.modified = datetime.now()
 
