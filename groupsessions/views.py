@@ -23,6 +23,7 @@ class HandleSessions(AuthenticatedView):
 		'''
 		try:
 			crowd = None
+			print 'Request use_existing_crowd: {}'.format(request.DATA['use_existing_crowd'])
 			use_existing = request.DATA['use_existing_crowd']
 			if not isinstance(request.DATA['use_existing_crowd'], bool):
 				# The param is a string not a boolean
