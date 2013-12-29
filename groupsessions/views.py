@@ -143,8 +143,9 @@ class HandleClips(AuthenticatedView):
 			c.save()
 			print 'Clip Saved'
 			serializer = ClipSerializer(c)
-			return Response(
-				serializer.data,
+			return Response({
+				'clip':serializer.data
+				},
 				status=status.HTTP_200_OK
 			)
 		except KeyError:
