@@ -1,4 +1,7 @@
 from django.db import models
+from django.db.models.signals import post_save
+
+import datetime
 
 from crowds.models import Crowd
 from users.models import Profile
@@ -104,6 +107,11 @@ class Clip(models.Model):
 		null = True
 	)
 
+@receiver(post_save, sender=Clip)
+def create_auth_token(sender, instance=None, created=False, **kwargs):
+	if created and instance:
+		instance.session.modified = datetime.now()
+
 class Comment(models.Model):
 	'''
 	Rapchat Comment Model
@@ -167,3 +175,4 @@ class Like(models.Model):
 
 	def __unicode__(self):
 		return 'Like: {}'.format(self.session.title)
+

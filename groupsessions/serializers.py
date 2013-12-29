@@ -3,7 +3,6 @@ from groupsessions.models import GroupSession, Clip, Comment, Like
 from crowds.serializers import CrowdSerializer
 from users.serializers import ProfileSerializer
 
-
 class CommentSerializer(serializers.ModelSerializer):
 
 	commenter = serializers.Field(source='creator.user.username')
