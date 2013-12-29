@@ -8,6 +8,8 @@ from crowds.models import Crowd
 from users.models import Profile
 from core.api import AuthenticatedView
 
+import json
+
 class HandleSessions(AuthenticatedView):
 
 	def post(self, request, format=None):
@@ -18,19 +20,18 @@ class HandleSessions(AuthenticatedView):
 		use_existing_crowd (required) -- Boolean value. If true we will use 'crowd' else create a new crowd with 'members' and 'title'
 		clip (required) -- File. A file holding the clip to be added to the new session
 		crowd_title (depends) -- The title of the crowd to create and link to this session
-		crowd_members (depends) -- A list of usernames to use as members for the crowd
+		crowd_members (depends) -- A json formatted list string of usernames to use as members for the crowd
 		crowd (depends) -- The id of the crowd to link the session to
 		'''
 		try:
 			crowd = None
 			print 'Request use_existing_crowd: {}'.format(request.DATA['use_existing_crowd'])
-			print 'Request with usernames: {}'.format(request.DATA['crowd_members'])
 			use_existing = request.DATA['use_existing_crowd']
 			if not isinstance(request.DATA['use_existing_crowd'], bool):
 				# The param is a string not a boolean
 				use_existing = False if request.DATA['use_existing_crowd'].lower() == 'false' else True
 			if not use_existing: 
-				usernames = request.DATA['crowd_members']
+				usernames = json.loads(request.DATA['crowd_members'])
 				print 'USERNAMES: {}'.format(usernames)
 				profiles = Profile.objects.filter(user__username__in=usernames)
 				title = ''
