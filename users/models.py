@@ -66,6 +66,9 @@ class Profile(models.Model):
 	def get_likes(self):
 		return self.like_set.all().order_by('-created')
 
+	def __unicode__(self):
+		return 'Profile: {}'.format(self.user.username)
+
 
 
 class FriendRequest(models.Model):

@@ -30,3 +30,6 @@ class Crowd(models.Model):
 
 	def num_members(self):
 		return self.members.count()
+
+	def __unicode__(self):
+		return 'Crowd: {}'.format(self.title)

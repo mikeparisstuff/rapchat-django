@@ -52,6 +52,9 @@ class GroupSession(models.Model):
 		except Clip.DoesNotExist:
 			return None
 
+	def __unicode__(self):
+		return 'Crowd: {}'.format(self.title)
+
 
 
 class Clip(models.Model):
@@ -161,3 +164,6 @@ class Like(models.Model):
 		blank = True,
 		null = True
 	)
+
+	def __unicode__(self):
+		return 'Like: {}'.format(self.session.title)
