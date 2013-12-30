@@ -111,7 +111,8 @@ class Clip(models.Model):
 @receiver(post_save, sender=Clip)
 def update_session_modified_timestamp(sender, instance=None, created=False, **kwargs):
 	if created and instance:
-		instance.session.modified = datetime.now()
+		print 'Updating modified timestamp on session: {}'.format(instance.session.pk)
+		instance.session.save()
 
 class Comment(models.Model):
 	'''
