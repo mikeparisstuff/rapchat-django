@@ -119,6 +119,11 @@ class HandleFriendRequests(AuthenticatedView):
 				{'error_description': 'You must include the friends username to create a friend request'},
 				status= status.HTTP_400_BAD_REQUEST
 				)
+		except User.DoesNotExist:
+			return Response({
+				'error_description': 'Could not find that user'
+				}, status=HTTP_400_BAD_REQUEST
+			)
 
 	def get(self, request, format=None):
 		'''
@@ -129,9 +134,9 @@ class HandleFriendRequests(AuthenticatedView):
 		}
 		'''
 		pending_me = request.user.get_profile().friend_requests_pending_my_response()
-		me_serializer = UserSerializer(pending_me, many=True)
+		me_serializer = FriendRequestSerializer(pending_me, many=True)
 		pending_them = request.user.get_profile().friend_requests_pending_their_response()
-		them_serializer = UserSerializer(pending_them, many=True)
+		them_serializer = FriendRequestSerializer(pending_them, many=True)
 		return Response(
 			{
 				'pending_me': me_serializer.data,
