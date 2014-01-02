@@ -177,7 +177,8 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
-    )
+    ),
+    'PAGINATE_BY': 1, 
 }
 
 AUTH_PROFILE_MODULE = 'users.Profile'

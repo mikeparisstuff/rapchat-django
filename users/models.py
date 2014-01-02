@@ -60,6 +60,15 @@ class Profile(models.Model):
 		)
 		request.delete()
 
+	def get_num_friends(self):
+		return self.friends.all().count()
+
+	def get_num_raps(self):
+		return self.clip_set.all().count()
+
+	def get_num_likes(self):
+		return self.like_set.all().count()
+
 	def get_likes(self):
 		return self.like_set.all().order_by('-created')
 

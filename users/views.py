@@ -8,7 +8,7 @@ from rest_framework.authtoken.models import Token
 
 from django.contrib.auth.models import User
 from users.models import Profile, FriendRequest
-from users.serializers import ProfileSerializer, UserSerializer, FriendRequestSerializer, ProfileSerializerNoFriends
+from users.serializers import ProfileSerializer, UserSerializer, FriendRequestSerializer, ProfileSerializerNoFriends, MyProfileSerializer
 from core.api import AuthenticatedView
 
 class WelcomePage(APIView):
@@ -88,7 +88,7 @@ class HandleMyProfile(AuthenticatedView):
 		Get my profile.
 		'''
 		me = Profile.objects.get(user__username = request.user.username)
-		serializer = ProfileSerializer(me)
+		serializer = MyProfileSerializer(me)
 		return Response(
 			serializer.data,
 			status=status.HTTP_200_OK
