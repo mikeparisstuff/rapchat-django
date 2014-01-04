@@ -1,9 +1,11 @@
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from groupsessions.models import GroupSession, Clip, Comment, Like
-from groupsessions.serializers import GroupSessionSerializer, ClipSerializer, CommentSerializer, LikeSerializer
+from groupsessions.serializers import GroupSessionSerializer, ClipSerializer, CommentSerializer, LikeSerializer, PaginatedGroupSessionSerializer
 from crowds.models import Crowd
 from users.models import Profile
 from core.api import AuthenticatedView
@@ -77,12 +79,12 @@ class HandleSessions(AuthenticatedView):
 
 		except KeyError:
 			return Response(
-				{'error_description': 'New sessions require a title and crowd'},
+				{'error': 'New sessions require a title and crowd'},
 				status=status.HTTP_400_BAD_REQUEST
 			)
 		except Crowd.DoesNotExist:
 			return Response(
-				{'error_description': 'Could not find crowd with id {}'.format(request.DATA['crowd'])},
+				{'error': 'Could not find crowd with id {}'.format(request.DATA['crowd'])},
 				status=status.HTTP_404_NOT_FOUND
 			)
 
@@ -95,6 +97,24 @@ class HandleSessions(AuthenticatedView):
 		'''
 		user_crowds = request.user.get_profile().crowd_set.all()
 		sessions = GroupSession.objects.filter(crowd__in=user_crowds).order_by('-modified')
+		
+
+		# paginator = Paginator(sessions, 1)
+		# page = request.QUERY_PARAMS.get('page')
+
+		# try:
+		# 	sessions = paginator.page(page)
+		# except PageNotAnInteger:
+		# 	# If page is not an integer, deliver first page
+		# 	sessions = paginator.page(1)
+		# except EmptyPage:
+		# 	# if page is out of range, return last page
+		# 	sessions = paginator.page(paginator.num_pages)
+
+		# serializer_context = {'request': request}
+		# serializer = PaginatedGroupSessionSerializer(sessions, context=serializer_context)
+		# return Response(serializer.data, status=status.HTTP_200_OK)
+
 		serializer = GroupSessionSerializer(sessions, many=True)
 		return Response(
 			{'sessions': serializer.data},
@@ -113,7 +133,7 @@ class HandleSession(AuthenticatedView):
 			return Response(serializer.data, status=status.HTTP_200_OK)
 		except GroupSession.DoesNotExist:
 			return Response({
-				'error_description': 'Could not find a session with that id.'
+				'error': 'Could not find a session with that id.'
 				}, status=status.HTTP_400_BAD_REQUEST
 			)
 
@@ -150,12 +170,12 @@ class HandleClips(AuthenticatedView):
 			)
 		except KeyError:
 			return Response(
-				{'error_description': 'A clip file and session are required to add a clip'},
+				{'error': 'A clip file and session are required to add a clip'},
 				status=status.HTTP_400_BAD_REQUEST
 			)
 		except GroupSession.DoesNotExist:
 			return Response(
-				{'error_description': 'The session with id {} could not be found'.format(request.DATA['session'])},
+				{'error': 'The session with id {} could not be found'.format(request.DATA['session'])},
 				status = status.HTTP_404_NOT_FOUND
 			)
 
@@ -169,9 +189,19 @@ class HandleClips(AuthenticatedView):
 			return Response(serializer.data, status=status.HTTP_200_OK)
 		except Clip.DoesNotExist:
 			return Response({
-				'error_description': 'Could not find any clips for session {}'.format(session)
+				'error': 'Could not find any clips for session {}'.format(session)
 				}, status=status.HTTP_400_BAD_REQUEST
 			)
+
+class HandleMyClips(AuthenticatedView):
+	def get(self, request, format=None):
+		'''
+		Get all my clips.
+		'''
+		clips = request.user.get_profile().clip_set.all().order_by('-created')
+		serializer = ClipSerializer(clips, many=True)
+		return Response({'clips': serializer.data}, status=status.HTTP_200_OK)
+
 
 class HandleSessionComments(AuthenticatedView):
 	def post(self, request, format=None, session=None):
@@ -196,7 +226,7 @@ class HandleSessionComments(AuthenticatedView):
 			)
 		except KeyError:
 			return Response({
-				'error_description': 'Error creating comment. Comments need a session and comment_text.'
+				'error': 'Error creating comment. Comments need a session and comment_text.'
 				},
 				status=status.HTTP_400_BAD_REQUEST
 			)
@@ -223,13 +253,13 @@ class HandleSessionComments(AuthenticatedView):
 			)
 		except KeyError:
 			return Response({
-				'error_description': 'Need a session to find comments for.'
+				'error': 'Need a session to find comments for.'
 				},
 				status=status.HTTP_400_BAD_REQUEST
 			)
 		except GroupSession.DoesNotExist:
 			return Response({
-				'error_description': 'Sorry, we could not find that session.'
+				'error': 'Sorry, we could not find that session.'
 				},
 				status=status.HTTP_400_BAD_REQUEST
 			)

@@ -1,4 +1,4 @@
-from rest_framework import serializers
+from rest_framework import serializers, pagination
 from groupsessions.models import GroupSession, Clip, Comment, Like
 from crowds.serializers import CrowdSerializer
 from users.serializers import ProfileSerializer
@@ -73,6 +73,13 @@ class GroupSessionSerializer(serializers.ModelSerializer):
 			'created',
 			'modified'	
 		)
+
+class PaginatedGroupSessionSerializer(pagination.PaginationSerializer):
+	'''
+	Serializes page objects of query sets
+	'''
+	class Meta:
+		object_serializer_class = GroupSessionSerializer
 
 class ClipSerializer(serializers.ModelSerializer):
 
