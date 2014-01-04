@@ -66,7 +66,7 @@ class HandleUsers(APIView):
 			)
 		except KeyError:
 			error = {
-				'error_description': "User's must have a username, email address, and password"
+				'error': "User's must have a username, email address, and password"
 			}
 			return Response(
 				error,
@@ -116,12 +116,12 @@ class HandleFriendRequests(AuthenticatedView):
 			)
 		except KeyError:
 			return Response(
-				{'error_description': 'You must include the friends username to create a friend request'},
+				{'error': 'You must include the friends username to create a friend request'},
 				status= status.HTTP_400_BAD_REQUEST
 				)
 		except User.DoesNotExist:
 			return Response({
-				'error_description': 'Could not find that user'
+				'error': 'Could not find that user'
 				}, status=HTTP_400_BAD_REQUEST
 			)
 
@@ -176,12 +176,12 @@ class HandleFriendRequestReplies(AuthenticatedView):
 
 		except User.DoesNotExist:
 			return Response(
-				{'error_description': 'User could not be found with that username'},
+				{'error': 'User could not be found with that username'},
 				status=stuats.HTTP_404_NOT_FOUND
 			)
 		except KeyError:
 			return Response(
-				{'error_description': 'Invalid parameters for responding to a friend request'},
+				{'error': 'Invalid parameters for responding to a friend request'},
 				status=status.HTTP_400_BAD_REQUEST
 			)
 

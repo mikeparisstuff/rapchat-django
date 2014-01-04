@@ -40,12 +40,12 @@ class HandleCrowds(AuthenticatedView):
 			)
 		except KeyError:
 			return Response(
-				{'error_description': 'All crowds must have a list of members'},
+				{'error': 'All crowds must have a list of members'},
 				status=status.HTTP_400_BAD_REQUEST
 			)
 		except Profile.DoesNotExist:
 			return Response(
-				{'error_description': 'One or more profiles in the members list could not be found'},
+				{'error': 'One or more profiles in the members list could not be found'},
 				status=status.HTTP_404_NOT_FOUND
 			)
 
