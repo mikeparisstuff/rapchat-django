@@ -94,6 +94,34 @@ class HandleMyProfile(AuthenticatedView):
 			status=status.HTTP_200_OK
 		)
 
+	def put(self, request, format=None):
+		'''
+		Update my profile
+
+		first_name (required) -- The users first name
+		last_name (required) -- The users last name
+		email (required) -- The users email address
+		phone_number (required) -- The users phone number in format 'xxx-xxx-xxxx'		 
+		'''
+		me = request.user.get_profile()
+		try:
+			me.user.first_name = request.DATA['first_name']
+			me.user.last_name = request.DATA['last_name']
+			me.user.email = request.DATA['email']
+			me.phone_number = request.DATA['phone_number']
+			me.save()
+			me.user.save()
+			serializer = ProfileSerializer(me)
+			return Response({
+				'profile': serializer.data
+				}, status=status.HTTP_200_OK
+			)
+		except KeyError:
+			return Response({
+				'error': 'Must include first_name, last_name, email, and phone_number'
+				}, status=status.HTTP_400_BAD_REQUEST
+			)
+
 class HandleFriendRequests(AuthenticatedView):
 
 	def post(self, request, format=None):
