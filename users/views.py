@@ -81,6 +81,28 @@ class HandleUsers(APIView):
 		serializer = ProfileSerializer(profiles, many=True)
 		return Response(serializer.data, status=status.HTTP_200_OK)
 
+class HandleSearch(AuthenticatedView):
+
+	def get(self, request, format=None):
+		'''
+		Search for rapchat users!
+
+		username (required) -- The username query to search for as a query parameter
+		'''
+		try:
+			print 'Query Params: {}'.format(request.QUERY_PARAMS['username'])
+			profiles = User.objects.filter(username__icontains = request.QUERY_PARAMS['username'])
+			serializer = UserSerializer(profiles, many=True)
+			return Response({
+				'profiles': serializer.data
+				}, status=status.HTTP_200_OK
+			)
+		except Profile.DoesNotExist:
+			return Response({
+				'profiles': []
+				})
+
+
 class HandleMyProfile(AuthenticatedView):
 
 	def get(self, request, format=None):
