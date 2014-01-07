@@ -9,7 +9,7 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
 from users.models import Profile, FriendRequest
 from users.serializers import ProfileSerializer, UserSerializer, FriendRequestSerializer, ProfileSerializerNoFriends, MyProfileSerializer
-from core.api import AuthenticatedView
+from core.api import AuthenticatedView, UnauthenticatedView
 
 class WelcomePage(APIView):
 	def get(self, request, format=None):
@@ -101,6 +101,19 @@ class HandleSearch(AuthenticatedView):
 			return Response({
 				'profiles': []
 				})
+
+class HandleInvites(UnauthenticatedView):
+
+	def get(self, request, format=None):
+		'''
+		Hit this endpoint to be redirected to the correct app store to download the app
+		'''
+		type_of_device = None
+		if 'iPhone' in request.META['HTTP_USER_AGENT']:
+			type_of_device = 'iPhone'
+		elif 'Android' in request.META['HTTP_USER_AGENT']:
+			type_of_device = 'Android'
+		return Response('You are using an {} device'.format(type_of_device))
 
 
 class HandleMyProfile(AuthenticatedView):
