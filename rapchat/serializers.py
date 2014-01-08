@@ -124,7 +124,8 @@ class CrowdSerializer(serializers.ModelSerializer):
 		)
 
 class CrowdSerializerNoMembers(serializers.ModelSerializer):
-	class meta:
+	
+	class Meta:
 		model = Crowd
 		fields = (
 			'id',

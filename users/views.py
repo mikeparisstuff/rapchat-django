@@ -8,7 +8,7 @@ from rest_framework.authtoken.models import Token
 
 from django.contrib.auth.models import User
 from users.models import Profile, FriendRequest
-from rapchat.serializers import ProfileSerializer, UserSerializer, FriendRequestSerializer, ProfileSerializerNoFriends, MyProfileSerializer, PublicProfileSerializer, LikeSerializer
+from rapchat.serializers import ProfileSerializer, UserSerializer, FriendRequestSerializer, ProfileSerializerNoFriends, MyProfileSerializer, PublicProfileSerializer, LikeSerializerNoMembers
 from core.api import AuthenticatedView, UnauthenticatedView
 
 class WelcomePage(APIView):
