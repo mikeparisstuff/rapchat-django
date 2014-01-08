@@ -26,6 +26,7 @@ class Profile(models.Model):
 		max_length = 15
 	)
 
+
 	def get_token(self):
 		return Token.objects.get(user=self.user)
 
@@ -71,6 +72,12 @@ class Profile(models.Model):
 
 	def get_likes(self):
 		return self.like_set.all().order_by('-created')
+
+	def get_liked_sessions(self):
+		likes = self.like_set.all()
+		print 'Get liked sessions'
+		sessions = [like.session for like in likes];
+		return sessions
 
 	def __unicode__(self):
 		return 'Profile {}: {}'.format(self.pk, self.user.username)

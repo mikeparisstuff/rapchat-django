@@ -8,7 +8,7 @@ from rest_framework.authtoken.models import Token
 
 from django.contrib.auth.models import User
 from users.models import Profile, FriendRequest
-from users.serializers import ProfileSerializer, UserSerializer, FriendRequestSerializer, ProfileSerializerNoFriends, MyProfileSerializer
+from rapchat.serializers import ProfileSerializer, UserSerializer, FriendRequestSerializer, ProfileSerializerNoFriends, MyProfileSerializer, PublicProfileSerializer, LikeSerializer
 from core.api import AuthenticatedView, UnauthenticatedView
 
 class WelcomePage(APIView):
@@ -80,6 +80,27 @@ class HandleUsers(APIView):
 		profiles = Profile.objects.all()
 		serializer = ProfileSerializer(profiles, many=True)
 		return Response(serializer.data, status=status.HTTP_200_OK)
+
+class HandleUser(AuthenticatedView):
+	def get(self, request, format=None, username=None):
+		'''
+		Return a profiles designated by the profile id in the url /users/<id>/
+		'''
+		try:
+			user = User.objects.get(username=username)
+			profile = user.get_profile()
+			prof_serializer = PublicProfileSerializer(profile)
+			likes = profile.get_likes()
+			likes_serializer = LikeSerializer(likes, many=True)
+			return Response({
+				'profile': prof_serializer.data,
+				'likes': likes_serializer.data
+				}, status=status.HTTP_200_OK
+			)
+		except User.DoesNotExist:
+			return Response({
+				'error': 'Could not find that user'
+				})
 
 class HandleSearch(AuthenticatedView):
 

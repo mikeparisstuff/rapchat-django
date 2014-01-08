@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 
 from users.models import Profile
 from crowds.models import Crowd
-from crowds.serializers import CrowdSerializer
+from rapchat.serializers import CrowdSerializer
 from core.api import AuthenticatedView
 
 class HandleCrowds(AuthenticatedView):

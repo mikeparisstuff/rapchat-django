@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from groupsessions.models import GroupSession, Clip, Comment, Like
-from groupsessions.serializers import GroupSessionSerializer, ClipSerializer, CommentSerializer, LikeSerializer, PaginatedGroupSessionSerializer
+from rapchat.serializers import GroupSessionSerializer, ClipSerializer, CommentSerializer, LikeSerializer, PaginatedGroupSessionSerializer
 from crowds.models import Crowd
 from users.models import Profile
 from core.api import AuthenticatedView
@@ -315,3 +315,11 @@ class HandleSessionLikes(AuthenticatedView):
 			},
 			status = status.HTTP_200_OK
 		)	
+
+class HandleUserLikes(AuthenticatedView):
+	'''
+	Get another users likes as designated by the username in the url
+	'''
+	def get(self, request, format=None, username=None):
+		pass
+		
