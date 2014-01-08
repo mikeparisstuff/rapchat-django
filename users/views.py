@@ -91,7 +91,7 @@ class HandleUser(AuthenticatedView):
 			profile = user.get_profile()
 			prof_serializer = PublicProfileSerializer(profile)
 			likes = profile.get_likes()
-			likes_serializer = LikeSerializer(likes, many=True)
+			likes_serializer = LikeSerializerNoMembers(likes, many=True)
 			return Response({
 				'profile': prof_serializer.data,
 				'likes': likes_serializer.data

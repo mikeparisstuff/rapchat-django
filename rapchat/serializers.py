@@ -123,6 +123,16 @@ class CrowdSerializer(serializers.ModelSerializer):
 			'modified'
 		)
 
+class CrowdSerializerNoMembers(serializers.ModelSerializer):
+	class meta:
+		model = Crowd
+		fields = (
+			'id',
+			'title',
+			'created',
+			'modified'
+		)
+
 ###########################################################
 # Comment, GroupSession, Clip, and Like Serializers
 ###########################################################
@@ -230,6 +240,7 @@ class GroupSessionSerializerNoMembers(serializers.ModelSerializer):
 			return None
 		return None
 
+	crowd = CrowdSerializerNoMembers()
 	comments = serializers.SerializerMethodField('get_comments')
 	likes = serializers.SerializerMethodField('get_likes')
 	clip_url = serializers.SerializerMethodField('get_most_recent_clip_url')
