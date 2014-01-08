@@ -99,27 +99,27 @@ class HandleSessions(AuthenticatedView):
 		sessions = GroupSession.objects.filter(crowd__in=user_crowds).order_by('-modified')
 		
 
-		# paginator = Paginator(sessions, 1)
-		# page = request.QUERY_PARAMS.get('page')
+		paginator = Paginator(sessions, 10)
+		page = request.QUERY_PARAMS.get('page')
 
-		# try:
-		# 	sessions = paginator.page(page)
-		# except PageNotAnInteger:
-		# 	# If page is not an integer, deliver first page
-		# 	sessions = paginator.page(1)
-		# except EmptyPage:
-		# 	# if page is out of range, return last page
-		# 	sessions = paginator.page(paginator.num_pages)
+		try:
+			sessions = paginator.page(page)
+		except PageNotAnInteger:
+			# If page is not an integer, deliver first page
+			sessions = paginator.page(1)
+		except EmptyPage:
+			# if page is out of range, return last page
+			sessions = paginator.page(paginator.num_pages)
 
-		# serializer_context = {'request': request}
-		# serializer = PaginatedGroupSessionSerializer(sessions, context=serializer_context)
-		# return Response(serializer.data, status=status.HTTP_200_OK)
+		serializer_context = {'request': request}
+		serializer = PaginatedGroupSessionSerializer(sessions, context=serializer_context)
+		return Response(serializer.data, status=status.HTTP_200_OK)
 
-		serializer = GroupSessionSerializer(sessions, many=True)
-		return Response(
-			{'sessions': serializer.data},
-			status=status.HTTP_200_OK
-		)
+		# serializer = GroupSessionSerializer(sessions, many=True)
+		# return Response(
+		# 	{'sessions': serializer.data},
+		# 	status=status.HTTP_200_OK
+		# )
 
 class HandleSession(AuthenticatedView):
 
