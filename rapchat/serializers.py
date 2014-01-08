@@ -280,7 +280,7 @@ class ClipSerializer(serializers.ModelSerializer):
 class LikeSerializer(serializers.ModelSerializer):
 
 	user = ProfileSerializer()
-	session = GroupSessionSerializerNoMembers()
+	session = GroupSessionSerializer()
 	username = serializers.Field(source='user.user.username')
 
 	class Meta:
