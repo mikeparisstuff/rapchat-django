@@ -111,6 +111,7 @@ class HandleSearch(AuthenticatedView):
 		username (required) -- The username query to search for as a query parameter
 		'''
 		try:
+			print 'search'
 			print 'Query Params: {}'.format(request.QUERY_PARAMS['username'])
 			profiles = User.objects.filter(username__icontains = request.QUERY_PARAMS['username'])
 			serializer = UserSerializer(profiles, many=True)
