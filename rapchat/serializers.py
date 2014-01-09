@@ -326,6 +326,7 @@ class LikeSerializerNoMembers(serializers.ModelSerializer):
 class PublicProfileSerializer(serializers.ModelSerializer):
 
 	user = UserSerializer()
+	friends = ProfileSerializerNoFriends(many=True)
 	num_likes = serializers.Field(source='get_num_likes')
 	num_friends = serializers.Field(source='get_num_friends')
 	num_raps = serializers.Field(source='get_num_raps')
@@ -335,6 +336,7 @@ class PublicProfileSerializer(serializers.ModelSerializer):
 		fields = (
 			'id',
 			'user',
+			'friends',
 			'num_likes',
 			'num_friends',
 			'num_raps'
