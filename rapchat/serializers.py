@@ -276,7 +276,9 @@ class ClipSerializer(serializers.ModelSerializer):
 		return clip.clip.url
 
 	def get_thumbnail_url(self, clip):
-		return clip.thumbnail.url
+		if clip.thumbnail:
+			return clip.thumbnail.url if clip.thumbnail.url else None
+		return None
 
 	url = serializers.SerializerMethodField('get_url')
 	thumbnail_url = serializers.SerializerMethodField('get_thumbnail_url')

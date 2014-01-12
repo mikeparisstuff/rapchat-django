@@ -24,12 +24,11 @@ urlpatterns = patterns('',
     url(r'^users/(?P<username>\w{3,50})/likes/$', sessions_views.HandleUserLikes.as_view(), name='handle_user_likes'),
     url(r'^users/me/$', users_views.HandleMyProfile.as_view(), name='get_my_user'),
     url(r'^users/me/likes/$', sessions_views.HandleSessionLikes.as_view(), name='get_my_likes'),
+    url(r'^users/me/clips/$', sessions_views.HandleMyClips.as_view(), name='get_my_clips'),
     url(r'^users/obtain-token/$', 'rest_framework.authtoken.views.obtain_auth_token'),
     url(r'^users/invite/$', users_views.HandleInvites.as_view(), name='invite_users'),
     
     url(r'^search/$', users_views.HandleSearch.as_view(), name='search_users'),
-
-    url(r'^users/me/clips/$', sessions_views.HandleMyClips.as_view(), name='get_my_clips'),
 
     url(r'^users/me/friends/$', users_views.HandleFriends.as_view(), name='handle_friends'),
     url(r'^users/me/friends/requests/$', users_views.HandleFriendRequests.as_view(), name='handle_friend_requests'),
