@@ -275,13 +275,18 @@ class ClipSerializer(serializers.ModelSerializer):
 	def get_url(self, clip):
 		return clip.clip.url
 
+	def get_thumbnail_url(self, clip):
+		return clip.thumbnail.url
+
 	url = serializers.SerializerMethodField('get_url')
+	thumbnail_url = serializers.SerializerMethodField('get_thumbnail_url')
 
 	class Meta:
 		model = Clip
 		fields = (
 			'id',
 			'clip',
+			'thumbnail_url',
 			'url',
 			'clip_num',
 			'creator',
