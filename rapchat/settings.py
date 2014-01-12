@@ -207,7 +207,7 @@ INSTALLED_APPS = (
     'core',
     'crowds',
     'groupsessions',
-    'video_stitching',
+    # 'video_stitching',
 )
 
 SWAGGER_SETTINGS = {
