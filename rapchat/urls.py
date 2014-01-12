@@ -24,7 +24,6 @@ urlpatterns = patterns('',
     url(r'^users/(?P<username>\w{3,50})/likes/$', sessions_views.HandleUserLikes.as_view(), name='handle_user_likes'),
     url(r'^users/me/$', users_views.HandleMyProfile.as_view(), name='get_my_user'),
     url(r'^users/me/likes/$', sessions_views.HandleSessionLikes.as_view(), name='get_my_likes'),
-    url(r'^users/me/clips/$', sessions_views.HandleUserClips.as_view(), name='get_my_clips'),
     url(r'^users/obtain-token/$', 'rest_framework.authtoken.views.obtain_auth_token'),
     url(r'^users/invite/$', users_views.HandleInvites.as_view(), name='invite_users'),
     
