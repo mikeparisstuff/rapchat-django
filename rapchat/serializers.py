@@ -280,6 +280,7 @@ class ClipSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Clip
 		fields = (
+			'id',
 			'clip',
 			'url',
 			'clip_num',

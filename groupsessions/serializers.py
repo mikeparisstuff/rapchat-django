@@ -83,10 +83,7 @@ class PaginatedGroupSessionSerializer(pagination.PaginationSerializer):
 
 class ClipSerializer(serializers.ModelSerializer):
 
-	def get_url(self, clip):
-		return clip.clip.url
-
-	url = serializers.SerializerMethodField('get_url')
+	url = serializers.Field(source='get_url')
 
 	class Meta:
 		model = Clip

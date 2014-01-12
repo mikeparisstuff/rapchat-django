@@ -9,6 +9,7 @@ from rapchat.serializers import GroupSessionSerializer, ClipSerializer, CommentS
 from crowds.models import Crowd
 from users.models import Profile
 from core.api import AuthenticatedView
+from core.video_stitching import video_stitcher
 
 import json
 
@@ -163,6 +164,13 @@ class HandleClips(AuthenticatedView):
 			c.save()
 			print 'Clip Saved'
 			serializer = ClipSerializer(c)
+			
+			# Call the method to stitch the video if number of clips >= 4
+			if sesh.num_clips >= 4:
+				clips = sesh.clip_set.order_by('-created')
+				clip_urls = [clip.get_url() for clip in clips]
+				video_stitcher.stitch_videos(clip_urls)
+
 			return Response({
 				'clip':serializer.data
 				},
@@ -322,4 +330,3 @@ class HandleUserLikes(AuthenticatedView):
 	'''
 	def get(self, request, format=None, username=None):
 		pass
-		
