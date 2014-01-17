@@ -97,7 +97,7 @@ class HandleSessions(AuthenticatedView):
 		We probably don't want each users friend information to be being sent etc.
 		'''
 		user_crowds = request.user.get_profile().crowd_set.all()
-		sessions = GroupSession.objects.filter(crowd__in=user_crowds).order_by('-modified')
+		sessions = GroupSession.objects.filter(crowd__in=user_crowds, is_complete=False).order_by('-modified')
 		
 
 		paginator = Paginator(sessions, 10)
@@ -121,6 +121,28 @@ class HandleSessions(AuthenticatedView):
 		# 	{'sessions': serializer.data},
 		# 	status=status.HTTP_200_OK
 		# )
+
+class HandleCompletedSessions(AuthenticatedView):
+	def get(self, request, format=None):
+		user_crowds = request.user.get_profile().crowd_set.all()
+		sessions = GroupSession.objects.filter(crowd__in=user_crowds, is_complete=True).order_by('-modified')
+		
+
+		paginator = Paginator(sessions, 10)
+		page = request.QUERY_PARAMS.get('page')
+
+		try:
+			sessions = paginator.page(page)
+		except PageNotAnInteger:
+			# If page is not an integer, deliver first page
+			sessions = paginator.page(1)
+		except EmptyPage:
+			# if page is out of range, return last page
+			sessions = paginator.page(paginator.num_pages)
+
+		serializer_context = {'request': request}
+		serializer = PaginatedGroupSessionSerializer(sessions, context=serializer_context)
+		return Response(serializer.data, status=status.HTTP_200_OK)		
 
 class HandleSession(AuthenticatedView):
 

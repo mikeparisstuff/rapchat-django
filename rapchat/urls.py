@@ -39,6 +39,8 @@ urlpatterns = patterns('',
 
     # SESSIONS ENDPOINTS
     url(r'^users/me/sessions/$', sessions_views.HandleSessions.as_view(), name='handle_sessions'),
+    url(r'^users/me/sessions/live/$', sessions_views.HandleSessions.as_view(), name='handle_sessions'),
+    url(r'^users/me/sessions/complete/$', sessions_views.HandleCompletedSessions.as_view(), name='handle_completed_sessions'),
     url(r'^sessions/(?P<session>\d+)/$', sessions_views.HandleSession.as_view(), name='handle_single_session'),
     url(r'^sessions/(?P<session>\d+)/clips/$', sessions_views.HandleClips.as_view(), name='handle_clips'),
     url(r'^sessions/(?P<session>\d+)/comments/$', sessions_views.HandleSessionComments.as_view(), name='handle_session_comments'),
