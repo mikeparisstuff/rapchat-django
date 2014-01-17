@@ -185,6 +185,10 @@ class HandleClips(AuthenticatedView):
 			print 'Clip Created'
 			c.save()
 			print 'Clip Saved'
+			if sesh.num_clips() >= 4:
+				print 'Setting session {} as complete'
+				sesh.is_complete = True
+				sesh.save()
 			serializer = ClipSerializer(c)
 			
 			# Call the method to stitch the video if number of clips >= 4
