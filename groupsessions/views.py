@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from groupsessions.models import GroupSession, Clip, Comment, Like
-from rapchat.serializers import GroupSessionSerializer, ClipSerializer, CommentSerializer, LikeSerializer, PaginatedGroupSessionSerializer
+from rapchat.serializers import GroupSessionSerializer, ClipSerializer, CommentSerializer, LikeSerializer, PaginatedGroupSessionSerializer, PaginatedCompletedGroupSessionSerializer
 from crowds.models import Crowd
 from users.models import Profile
 from core.api import AuthenticatedView
@@ -141,7 +141,7 @@ class HandleCompletedSessions(AuthenticatedView):
 			sessions = paginator.page(paginator.num_pages)
 
 		serializer_context = {'request': request}
-		serializer = PaginatedGroupSessionSerializer(sessions, context=serializer_context)
+		serializer = PaginatedCompletedGroupSessionSerializer(sessions, context=serializer_context)
 		return Response(serializer.data, status=status.HTTP_200_OK)		
 
 class HandleSession(AuthenticatedView):

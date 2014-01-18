@@ -209,6 +209,55 @@ class GroupSessionSerializer(serializers.ModelSerializer):
 			'modified'	
 		)
 
+class CompletedGroupSessionSerializer(serializers.ModelSerializer):
+
+	def get_comments(self, group_session):
+		if group_session:
+			return CommentSerializer(group_session.get_comments(), many=True).data
+		return None
+
+	def get_likes(self, group_session):
+		if group_session:
+			return group_session.like_set.all().count()
+		return None
+
+	def get_most_recent_clip_url(self, group_session):
+		if group_session:
+			clip = group_session.most_recent_clip()
+			if clip:
+				return clip.clip.url
+			return None
+		return None
+
+	def get_clips(self, group_session):
+		if group_session:
+			clips = group_session.get_clips()
+			return ClipSerializer(clips, many=True).data
+		return None
+
+	crowd = CrowdSerializer()
+	comments = serializers.SerializerMethodField('get_comments')
+	likes = serializers.SerializerMethodField('get_likes')
+	clip_urls = serializers.SerializerMethodField('get_clips')
+	thumbnail_url = serializers.SerializerMethodField('get_most_recent_thumbnail_url')
+
+	class Meta:
+		model = GroupSession
+		fields = (
+			'id',
+			'crowd',
+			'title',
+			'is_complete',
+			'comments',
+			'likes',
+			'clip_urls',
+			'thumbnail_url',
+			'created',
+			'modified'	
+		)
+
+
+
 class GroupSessionSerializerNoMembers(serializers.ModelSerializer):
 	# May be a cleaner way to get this relationship
 	# TODO: investigate
@@ -269,6 +318,10 @@ class PaginatedGroupSessionSerializer(pagination.PaginationSerializer):
 	'''
 	class Meta:
 		object_serializer_class = GroupSessionSerializer
+
+class PaginatedCompletedGroupSessionSerializer(pagination.PaginationSerializer):
+	class Meta:
+		object_serializer_class = CompletedGroupSessionSerializer
 
 class ClipSerializer(serializers.ModelSerializer):
 

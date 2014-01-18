@@ -50,6 +50,9 @@ class GroupSession(models.Model):
 	def get_comments(self):
 		return self.comment_set.all().order_by('created')
 
+	def get_clips(self):
+		return self.clip_set.all().order_by('created')
+
 	def most_recent_clip(self):
 		try:
 			return self.clip_set.latest('created')
