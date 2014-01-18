@@ -238,7 +238,7 @@ class CompletedGroupSessionSerializer(serializers.ModelSerializer):
 	crowd = CrowdSerializer()
 	comments = serializers.SerializerMethodField('get_comments')
 	likes = serializers.SerializerMethodField('get_likes')
-	clip_urls = serializers.SerializerMethodField('get_clips')
+	clips = serializers.SerializerMethodField('get_clips')
 
 	class Meta:
 		model = GroupSession
@@ -249,7 +249,7 @@ class CompletedGroupSessionSerializer(serializers.ModelSerializer):
 			'is_complete',
 			'comments',
 			'likes',
-			'clip_urls',
+			'clips',
 			'created',
 			'modified'	
 		)
