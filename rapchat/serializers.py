@@ -239,7 +239,6 @@ class CompletedGroupSessionSerializer(serializers.ModelSerializer):
 	comments = serializers.SerializerMethodField('get_comments')
 	likes = serializers.SerializerMethodField('get_likes')
 	clip_urls = serializers.SerializerMethodField('get_clips')
-	thumbnail_url = serializers.SerializerMethodField('get_most_recent_thumbnail_url')
 
 	class Meta:
 		model = GroupSession
@@ -251,7 +250,6 @@ class CompletedGroupSessionSerializer(serializers.ModelSerializer):
 			'comments',
 			'likes',
 			'clip_urls',
-			'thumbnail_url',
 			'created',
 			'modified'	
 		)
