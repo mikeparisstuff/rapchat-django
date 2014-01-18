@@ -220,7 +220,7 @@ class HandleClips(AuthenticatedView):
 		try:
 			clips = Clip.objects.filter(session=session)
 			serializer = ClipSerializer(clips, many=True)
-			return Response(serializer.data, status=status.HTTP_200_OK)
+			return Response({'clips': serializer.data}, status=status.HTTP_200_OK)
 		except Clip.DoesNotExist:
 			return Response({
 				'error': 'Could not find any clips for session {}'.format(session)
