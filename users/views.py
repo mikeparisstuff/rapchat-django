@@ -39,6 +39,7 @@ class HandleUsers(APIView):
 		first_name (optional) -- User's first name
 		last_name (optional) -- User's last name
 		phone_number (optional) -- User's current smartphone number
+		profile_picture (optional) -- A Square clipped profile picture encoded as jpg
 		'''
 		try:
 			user = User.objects.create_user(
@@ -57,6 +58,10 @@ class HandleUsers(APIView):
 			)
 			if 'phone_number' in request.DATA:
 				profile.phone_number = request.DATA['phone_number']
+				profile.save()
+			if 'profile_picture' in request.FILES:
+				f = request.FILES['profile_picture']
+				profile.profile_picture = f
 				profile.save()
 			serializer = ProfileSerializer(profile)
 			serializer.data['token'] = token.key
@@ -159,6 +164,7 @@ class HandleMyProfile(AuthenticatedView):
 		last_name (required) -- The users last name
 		email (required) -- The users email address
 		phone_number (required) -- The users phone number in format 'xxx-xxx-xxxx'		 
+		profile_picture (optional) -- A square clipped jpg to act as the users profile picture
 		'''
 		me = request.user.get_profile()
 		try:
@@ -166,6 +172,9 @@ class HandleMyProfile(AuthenticatedView):
 			me.user.last_name = request.DATA['last_name']
 			me.user.email = request.DATA['email']
 			me.phone_number = request.DATA['phone_number']
+			if 'profile_picture' in request.FILES:
+				f = request.FILES['profile_picture']
+				me.profile_picture = f
 			me.save()
 			me.user.save()
 			serializer = ProfileSerializer(me)

@@ -46,13 +46,21 @@ class FriendRequestSerializer(serializers.ModelSerializer):
 
 class ProfileSerializerNoFriends(serializers.ModelSerializer):
 	user = UserSerializer()
+	
+	def get_profile_picture_url(self, profile):
+		if profile.profile_picture:
+			return profile.profile_picture.url if profile.profile_picture.url else None
+		return None
+
+	profile_picture = serializers.SerializerMethodField('get_profile_picture_url')
 
 	class Meta:
 		model = Profile
 		fields = (
 			'id',
 			'user',
-			'phone_number'
+			'phone_number',
+			'profile_picture'
 		)
 
 
@@ -61,6 +69,13 @@ class ProfileSerializer(serializers.ModelSerializer):
 	user = UserSerializer()
 	# Give nested information for friends
 	friends = ProfileSerializerNoFriends(many=True)
+	
+	def get_profile_picture_url(self, profile):
+		if profile.profile_picture:
+			return profile.profile_picture.url if profile.profile_picture.url else None
+		return None
+
+	profile_picture = serializers.SerializerMethodField('get_profile_picture_url')
 
 	class Meta:
 		model = Profile
@@ -68,7 +83,8 @@ class ProfileSerializer(serializers.ModelSerializer):
 			'id',
 			'user',
 			'friends',
-			'phone_number'
+			'phone_number',
+			'profile_picture'
 		)
 
 class MyProfileSerializer(serializers.ModelSerializer):
@@ -87,11 +103,17 @@ class MyProfileSerializer(serializers.ModelSerializer):
 			return profile.get_num_friends()
 		return None
 
+	def get_profile_picture_url(self, profile):
+		if profile.profile_picture:
+			return profile.profile_picture.url if profile.profile_picture.url else None
+		return None
+
 	user = UserSerializer()
 	friends = ProfileSerializerNoFriends(many=True)
 	num_likes = serializers.SerializerMethodField('get_num_likes')
 	num_friends = serializers.SerializerMethodField('get_num_friends')
 	num_raps = serializers.SerializerMethodField('get_num_raps')
+	profile_picture = serializers.SerializerMethodField('get_profile_picture_url')
 
 	class Meta:
 		model = Profile
@@ -102,7 +124,8 @@ class MyProfileSerializer(serializers.ModelSerializer):
 			'phone_number',
 			'num_likes',
 			'num_friends',
-			'num_raps'
+			'num_raps',
+			'profile_picture'
 		)
 
 #################################################################

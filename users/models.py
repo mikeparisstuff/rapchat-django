@@ -18,6 +18,15 @@ class Profile(models.Model):
 		null = False
 	)
 
+	def get_profile_picture_upload_path(self, filename):
+		return 'profiles/profile_{}/profile_picture.jpg'.format(self.session.id, self.clip_num)
+
+	profile_picture = models.FileField(
+		upload_to=get_profile_picture_upload_path,
+		null = True,
+		blank = True
+	)
+
 	friends = models.ManyToManyField(
 		'self'
 	)
@@ -26,6 +35,9 @@ class Profile(models.Model):
 		max_length = 15
 	)
 
+
+	def get_profile_picture_url(self, profile):
+		return profile.profile_picture.url
 
 	def get_token(self):
 		return Token.objects.get(user=self.user)
