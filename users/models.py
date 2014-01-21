@@ -19,7 +19,7 @@ class Profile(models.Model):
 	)
 
 	def get_profile_picture_upload_path(self, filename):
-		return 'profiles/profile_{}/profile_picture.jpg'.format(self.session.id, self.clip_num)
+		return 'profiles/profile_{}/profile_picture.jpg'.format(self.user.username)
 
 	profile_picture = models.FileField(
 		upload_to=get_profile_picture_upload_path,
