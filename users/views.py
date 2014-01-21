@@ -254,17 +254,22 @@ class HandleFriendRequestReplies(AuthenticatedView):
 			me = request.user.get_profile()
 			accepted = request.DATA['accepted']
 			if accepted:
-				me.accept_friend_request(sender)
+				request = me.accept_friend_request(sender)
+				serializer = FriendRequestSerializer(request)
 				return Response(
 					{
-					'detail':'Successfully accepted friend request from {}'.format(sender.user.username)
+					'detail':'Successfully accepted friend request from {}'.format(sender.user.username),
+					'request': serializer.data
 					},
 					status=status.HTTP_200_OK
 				)
 			else:
-				me.decline_friend_request(sender)
+				request = me.decline_friend_request(sender)
+				serializer = FriendRequestSerializer(request)
 				return Response(
-					{'detail': 'Successfully declined friend request from {}'.format(sender.user.username)},
+					{'detail': 'Successfully declined friend request from {}'.format(sender.user.username),
+					'request': serializer.data
+					},
 					status=status.HTTP_200_OK
 				)
 

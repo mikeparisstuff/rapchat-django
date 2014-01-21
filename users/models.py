@@ -65,6 +65,7 @@ class Profile(models.Model):
 		request.is_accepted = True
 		request.save()
 		self.friends.add(sender)
+		return request
 
 	def decline_friend_request(self, sender):
 		request = FriendRequest.objects.get(
@@ -72,6 +73,7 @@ class Profile(models.Model):
 			requested = self.user
 		)
 		request.delete()
+		return request
 
 	def get_num_friends(self):
 		return self.friends.all().count()
