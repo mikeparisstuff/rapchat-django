@@ -439,12 +439,20 @@ class PublicProfileSerializer(serializers.ModelSerializer):
 	num_friends = serializers.Field(source='get_num_friends')
 	num_raps = serializers.Field(source='get_num_raps')
 
+	def get_profile_picture_url(self, profile):
+		if profile.profile_picture:
+			return profile.profile_picture.url if profile.profile_picture.url else None
+		return None
+
+	profile_picture = serializers.SerializerMethodField('get_profile_picture_url')
+
 	class Meta:
 		model = Profile
 		fields = (
 			'id',
 			'user',
 			'friends',
+			'profile_picture',
 			'num_likes',
 			'num_friends',
 			'num_raps'
