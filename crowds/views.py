@@ -67,3 +67,4 @@ class HandleCrowds(AuthenticatedView):
 			{'crowds': serializer.data},
 			status=status.HTTP_200_OK	
 		)
+

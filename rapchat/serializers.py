@@ -29,9 +29,35 @@ class UserSerializer(serializers.ModelSerializer):
 			'last_login'
 		)
 
+class UserSerializerWithProfilePicture(serializers.ModelSerializer):
+	
+	def get_profile_picture(self, user):
+		if user:
+			profile = user.get_profile()
+			if profile.profile_picture:	
+				return profile.profile_picture.url if profile.profile_picture.url else None
+		return None
+	profile_picture = serializers.SerializerMethodField('get_profile_picture')
+	
+	class Meta:
+		model = User
+		read_only_fields = (
+			'id',
+		)
+		fields = (
+			'id',
+			'first_name',
+			'last_name',
+			'email',
+			'username',
+			'profile_picture',
+			'date_joined',
+			'last_login'
+		)
+
 class FriendRequestSerializer(serializers.ModelSerializer):
 
-	sender = UserSerializer()
+	sender = UserSerializerWithProfilePicture()
 	requested = UserSerializer()
 
 	class Meta:
@@ -46,7 +72,7 @@ class FriendRequestSerializer(serializers.ModelSerializer):
 
 class ProfileSerializerNoFriends(serializers.ModelSerializer):
 	user = UserSerializer()
-	
+
 	def get_profile_picture_url(self, profile):
 		if profile.profile_picture:
 			return profile.profile_picture.url if profile.profile_picture.url else None
