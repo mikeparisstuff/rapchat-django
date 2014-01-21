@@ -253,7 +253,12 @@ class HandleFriendRequestReplies(AuthenticatedView):
 			sender = sender.get_profile()
 			me = request.user.get_profile()
 			accepted = request.DATA['accepted']
-			if accepted:
+			print 'Accepted has is bool {}'.format(isinstance(accepted, bool))
+			print 'Accepted has type string {}'.format(isinstance(accepted, str))
+			print 'Accepted: {}'.format(accepted)
+			print 'Accepted is true: {}'.format(accepted==True)
+			if accepted is True:
+				print 'Accepting Request'
 				request = me.accept_friend_request(sender)
 				serializer = FriendRequestSerializer(request)
 				return Response(
@@ -264,6 +269,7 @@ class HandleFriendRequestReplies(AuthenticatedView):
 					status=status.HTTP_200_OK
 				)
 			else:
+				print 'Declining request'
 				request = me.decline_friend_request(sender)
 				serializer = FriendRequestSerializer(request)
 				return Response(
