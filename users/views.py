@@ -251,13 +251,13 @@ class HandleFriendRequestReplies(AuthenticatedView):
 			sender = User.objects.get(username=request.DATA['username'])
 			sender = sender.get_profile()
 			me = request.user.get_profile()
-			accepted = request.DATA['accepted']
+			accepted = bool(request.DATA['accepted'])
 			print 'Accepted has is bool {}'.format(isinstance(accepted, bool))
 			print 'Accepted has type string {}'.format(isinstance(accepted, str))
 			print 'Accepted has type int: {}'.format(isinstance(accepted, int))
 			print 'Accepted: {}'.format(accepted)
 			print 'Accepted is true: {}'.format(accepted==True)
-			if accepted == True:
+			if accepted:
 				print 'Accepting Request'
 				request = me.accept_friend_request(sender)
 				serializer = FriendRequestSerializer(request)
