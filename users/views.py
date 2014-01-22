@@ -258,7 +258,9 @@ class HandleFriendRequestReplies(AuthenticatedView):
 			print 'Accepted: {}'.format(accepted)
 			print 'Accepted == 1 is: {}'.format(accepted==1)
 			print 'Accepted == 0 is: {}'.format(accepted==0)
-			if accepted:
+			print 'Accepted == True is {}'.format(accepted==True)
+			print 'Accepted == False is {}'.format(accepted==False)
+			if accepted == True:
 				print 'Accepting Request'
 				request = me.accept_friend_request(sender)
 				serializer = FriendRequestSerializer(request)
