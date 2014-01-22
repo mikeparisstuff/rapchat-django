@@ -53,16 +53,15 @@ class HandleUsers(APIView):
 				user.last_name = request.DATA['last_name']
 			user.save()
 			token = Token.objects.get(user=user)
-			profile = Profile.objects.create(
+			profile = Profile(
 				user = user
 			)
 			if 'phone_number' in request.DATA:
 				profile.phone_number = request.DATA['phone_number']
-				profile.save()
 			if 'profile_picture' in request.FILES:
 				f = request.FILES['profile_picture']
 				profile.profile_picture = f
-				profile.save()
+			profile.save()
 			serializer = ProfileSerializer(profile)
 			serializer.data['token'] = token.key
 			return Response(
@@ -255,9 +254,10 @@ class HandleFriendRequestReplies(AuthenticatedView):
 			accepted = request.DATA['accepted']
 			print 'Accepted has is bool {}'.format(isinstance(accepted, bool))
 			print 'Accepted has type string {}'.format(isinstance(accepted, str))
+			print 'Accepted has type int: {}'.format(isinstance(accepted, int))
 			print 'Accepted: {}'.format(accepted)
 			print 'Accepted is true: {}'.format(accepted==True)
-			if accepted is True:
+			if accepted == True:
 				print 'Accepting Request'
 				request = me.accept_friend_request(sender)
 				serializer = FriendRequestSerializer(request)
