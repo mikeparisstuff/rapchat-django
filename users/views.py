@@ -252,15 +252,10 @@ class HandleFriendRequestReplies(AuthenticatedView):
 			sender = sender.get_profile()
 			me = request.user.get_profile()
 			accepted = request.DATA['accepted']
-			print 'Accepted has is bool {}'.format(isinstance(accepted, bool))
-			print 'Accepted has type string {}'.format(isinstance(accepted, str))
-			print 'Accepted has type int: {}'.format(isinstance(accepted, int))
-			print 'Accepted: {}'.format(accepted)
-			print 'Accepted == 1 is: {}'.format(accepted==1)
-			print 'Accepted == 0 is: {}'.format(accepted==0)
-			print 'Accepted == True is {}'.format(accepted==True)
-			print 'Accepted == False is {}'.format(accepted==False)
-			if accepted == True:
+			if isinstance(accepted, unicode):
+				# Fixes some weird bug where json bools are converted to unicode
+				accepted = False if accepted == u'0' else True
+			if accepted:
 				print 'Accepting Request'
 				request = me.accept_friend_request(sender)
 				serializer = FriendRequestSerializer(request)
