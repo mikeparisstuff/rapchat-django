@@ -337,11 +337,18 @@ class GroupSessionSerializerNoMembers(serializers.ModelSerializer):
 			return None
 		return None
 
+	def get_clips(self, group_session):
+		if group_session:
+			clips = group_session.get_clips()
+			return ClipSerializer(clips, many=True).data
+		return None
+
 	crowd = CrowdSerializerNoMembers()
 	comments = serializers.SerializerMethodField('get_comments')
 	likes = serializers.SerializerMethodField('get_likes')
 	clip_url = serializers.SerializerMethodField('get_most_recent_clip_url')
 	thumbnail_url = serializers.SerializerMethodField('get_most_recent_thumbnail_url')
+	clips = serializers.SerializerMethodField('get_clips')
 
 	class Meta:
 		model = GroupSession
@@ -353,6 +360,7 @@ class GroupSessionSerializerNoMembers(serializers.ModelSerializer):
 			'comments',
 			'likes',
 			'clip_url',
+			'clips',
 			'thumbnail_url',
 			'created',
 			'modified'	
