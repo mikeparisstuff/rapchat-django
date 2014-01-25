@@ -305,3 +305,18 @@ class HandleFriends(AuthenticatedView):
 			{"friends": serializer.data},
 			status=status.HTTP_200_OK
 		)
+
+	def delete(self, request, format=None):
+		'''
+		Remove a friend for the current user.
+
+		username -- The username of the user to remove as friend
+		'''
+		me = request.user.get_profile()
+		friend = me.remove_friend(request.DATA['username'])
+		serializer = ProfileSerializerNoFriends(friend)
+		return Response(
+			{'friend': serializer.data,
+			'detail': 'Successfully Removed Friend.'},
+			status=status.HTTP_200_OK
+		)

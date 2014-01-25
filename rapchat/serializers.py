@@ -258,6 +258,64 @@ class GroupSessionSerializer(serializers.ModelSerializer):
 			'modified'	
 		)
 
+class GroupSessionSerializerUnkownStatus(serializers.ModelSerializer):
+
+	def get_comments(self, group_session):
+			if group_session:
+				return CommentSerializer(group_session.get_comments(), many=True).data
+			return None
+
+	def get_likes(self, group_session):
+		if group_session:
+			return group_session.like_set.all().count()
+		return None
+
+	def get_most_recent_clip_url(self, group_session):
+		if group_session:
+			clip = group_session.most_recent_clip()
+			if clip:
+				return clip.clip.url
+			return None
+		return None
+
+	def get_most_recent_thumbnail_url(self, group_session):
+		if group_session:
+			clip = group_session.most_recent_clip()
+			if clip:
+				try:
+					return clip.thumbnail.url
+				except ValueError:
+					return None
+			return None
+		return None
+
+		def get_clips(self, group_session):
+			if group_session:
+				clips = group_session.get_clips()
+				return ClipSerializer(clips, many=True).data
+			return None
+
+		crowd = CrowdSerializer()
+		comments = serializers.SerializerMethodField('get_comments')
+		clip_url = serializers.SerializerMethodField('get_most_recent_clip_url')
+		thumbnail_url = serializers.SerializerMethodField('get_most_recent_thumbnail_url')
+		likes = serializers.SerializerMethodField('get_likes')
+		clips = serializers.SerializerMethodField('get_clips')
+
+		class Meta:
+			model = GroupSession
+			fields = (
+				'id',
+				'crowd',
+				'title',
+				'is_complete',
+				'comments',
+				'likes',
+				'clips',
+				'created',
+				'modified'	
+			)	
+
 class CompletedGroupSessionSerializer(serializers.ModelSerializer):
 
 	def get_comments(self, group_session):

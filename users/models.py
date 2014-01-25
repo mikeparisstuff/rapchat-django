@@ -60,7 +60,8 @@ class Profile(models.Model):
 	def accept_friend_request(self, sender):
 		request = FriendRequest.objects.get(
 			sender = sender.user,
-			requested = self.user
+			requested = self.user,
+			is_accepted = False
 		)
 		request.is_accepted = True
 		request.save()
@@ -70,10 +71,18 @@ class Profile(models.Model):
 	def decline_friend_request(self, sender):
 		request = FriendRequest.objects.get(
 			sender = sender.user,
-			requested = self.user
+			requested = self.user,
+			is_accepted = False
 		)
 		request.delete()
 		return request
+
+	def remove_friend(self, username):
+		# friend = self.friends.objects.get(username=username)
+		friend = Profile.objects.get(user__username=username)
+		self.friends.remove(friend)
+		print 'Removed Friend {}'.format(friend.user.username)
+		return friend
 
 	def get_num_friends(self):
 		return self.friends.all().count()
