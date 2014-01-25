@@ -313,7 +313,7 @@ class HandleFriends(AuthenticatedView):
 		username -- The username of the user to remove as friend
 		'''
 		me = request.user.get_profile()
-		friend = me.remove_friend(request.DATA['username'])
+		friend = me.remove_friend(request.QUERY_PARAMS['username'])
 		serializer = ProfileSerializerNoFriends(friend)
 		return Response(
 			{'friend': serializer.data,
