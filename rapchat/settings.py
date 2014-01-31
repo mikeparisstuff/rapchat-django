@@ -48,6 +48,17 @@ elif INSTANCE_ID == 'HEROKU':
     DATABASES = {
         'default': dj_database_url.config()
     }
+elif INSTANCE_ID == 'Prod' :
+    DATABASES = {
+	'default': {
+	  'ENGINE': 'django.db.backends.postgresql_psycopg2',
+	  'NAME': 'rapchat_prod',
+	  'USER': 'rapback1',
+	  'PASSWORD': os.environ.get('DB_PW'),
+	  'HOST': 'localhost',
+	  'PORT': '',
+	}
+    }
 else:
     DATABASES = {
         'default': {
