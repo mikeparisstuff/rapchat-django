@@ -6,7 +6,8 @@ from feedback.models import FeedbackMessage
 class FeedbackMessageAdmin(admin.ModelAdmin):
 	list_display = (
 		'creator',
-		'created'
+		'created',
+		'was_read'
 	)
 
 admin.site.register(FeedbackMessage, FeedbackMessageAdmin)
