@@ -14,7 +14,7 @@ class HandleFeedback(AuthenticatedView):
 		'''
 		try:
 			creator = request.user.get_profile()
-			feedback = FeedbackMessage.create(
+			feedback = FeedbackMessage.objects.create(
 				creator = creator,
 				message = request.DATA['message']
 			)
