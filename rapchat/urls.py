@@ -6,6 +6,7 @@ from rest_framework import routers
 from users import views as users_views
 from crowds import views as crowds_views
 from groupsessions import views as sessions_views
+from feedback import views as feedback_views
 
 admin.autodiscover()
 
@@ -45,4 +46,7 @@ urlpatterns = patterns('',
     url(r'^sessions/(?P<session>\d+)/clips/$', sessions_views.HandleClips.as_view(), name='handle_clips'),
     url(r'^sessions/(?P<session>\d+)/comments/$', sessions_views.HandleSessionComments.as_view(), name='handle_session_comments'),
     # url(r'^sessions/likes/$', sessions_views.HandleSessionLikes.as_view(), name='handle_likes'),
+
+    url(r'^feedback/$', feedback_views.HandleFeedback.as_view(), name='handle_feedback'),
+
 )

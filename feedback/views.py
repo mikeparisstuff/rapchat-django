@@ -2,6 +2,8 @@
 from rest_framework import status
 from rest_framework.response import Response
 
+from core.api import AuthenticatedView
+
 from feedback.models import FeedbackMessage
 
 class HandleFeedback(AuthenticatedView):
