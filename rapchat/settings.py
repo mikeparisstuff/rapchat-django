@@ -207,6 +207,7 @@ INSTALLED_APPS = (
     'core',
     'crowds',
     'groupsessions',
+    'feedback',
     # 'video_stitching',
 )
 
