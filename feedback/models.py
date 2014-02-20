@@ -11,7 +11,7 @@ class FeedbackMessage(models.Model):
 		Profile
 	)
 
-	message = models.CharField(
+	message = models.TextField(
 		max_length = 2000
 	)
 
