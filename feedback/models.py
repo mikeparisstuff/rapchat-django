@@ -15,6 +15,10 @@ class FeedbackMessage(models.Model):
 		max_length = 2000
 	)
 
+	was_read = models.BooleanField(
+		default = False
+	)
+
 	created = models.DateTimeField(
 		auto_now_add = True,
 		blank = True,
