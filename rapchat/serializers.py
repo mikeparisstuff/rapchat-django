@@ -4,7 +4,7 @@ from rest_framework import serializers, pagination
 
 from groupsessions.models import GroupSession, Clip, Comment, Like
 from users.models import Profile, FriendRequest
-from crowds.models import Crowd
+# from crowds.models import Crowd
 
 
 
@@ -158,30 +158,30 @@ class MyProfileSerializer(serializers.ModelSerializer):
 # Crowd Serializers
 #################################################################
 
-class CrowdSerializer(serializers.ModelSerializer):
+# class CrowdSerializer(serializers.ModelSerializer):
 
-	members = ProfileSerializerNoFriends(many=True)
+# 	members = ProfileSerializerNoFriends(many=True)
 
-	class Meta:
-		model = Crowd
-		fields = (
-			'id',
-			'title',
-			'members',
-			'created',
-			'modified'
-		)
+# 	class Meta:
+# 		model = Crowd
+# 		fields = (
+# 			'id',
+# 			'title',
+# 			'members',
+# 			'created',
+# 			'modified'
+# 		)
 
-class CrowdSerializerNoMembers(serializers.ModelSerializer):
+# class CrowdSerializerNoMembers(serializers.ModelSerializer):
 	
-	class Meta:
-		model = Crowd
-		fields = (
-			'id',
-			'title',
-			'created',
-			'modified'
-		)
+# 	class Meta:
+# 		model = Crowd
+# 		fields = (
+# 			'id',
+# 			'title',
+# 			'created',
+# 			'modified'
+# 		)
 
 ###########################################################
 # Comment, GroupSession, Clip, and Like Serializers
@@ -237,7 +237,7 @@ class GroupSessionSerializer(serializers.ModelSerializer):
 		return None
 
 
-	crowd = CrowdSerializer()
+	# crowd = CrowdSerializer()
 	comments = serializers.SerializerMethodField('get_comments')
 	likes = serializers.SerializerMethodField('get_likes')
 	clip_url = serializers.SerializerMethodField('get_most_recent_clip_url')
@@ -247,7 +247,6 @@ class GroupSessionSerializer(serializers.ModelSerializer):
 		model = GroupSession
 		fields = (
 			'id',
-			'crowd',
 			'title',
 			'is_complete',
 			'comments',
@@ -295,7 +294,7 @@ class GroupSessionSerializerUnkownStatus(serializers.ModelSerializer):
 				return ClipSerializer(clips, many=True).data
 			return None
 
-		crowd = CrowdSerializer()
+		# crowd = CrowdSerializer()
 		comments = serializers.SerializerMethodField('get_comments')
 		clip_url = serializers.SerializerMethodField('get_most_recent_clip_url')
 		thumbnail_url = serializers.SerializerMethodField('get_most_recent_thumbnail_url')
@@ -306,7 +305,6 @@ class GroupSessionSerializerUnkownStatus(serializers.ModelSerializer):
 			model = GroupSession
 			fields = (
 				'id',
-				'crowd',
 				'title',
 				'is_complete',
 				'comments',
@@ -342,7 +340,6 @@ class CompletedGroupSessionSerializer(serializers.ModelSerializer):
 			return ClipSerializer(clips, many=True).data
 		return None
 
-	crowd = CrowdSerializer()
 	comments = serializers.SerializerMethodField('get_comments')
 	likes = serializers.SerializerMethodField('get_likes')
 	clips = serializers.SerializerMethodField('get_clips')
@@ -351,7 +348,6 @@ class CompletedGroupSessionSerializer(serializers.ModelSerializer):
 		model = GroupSession
 		fields = (
 			'id',
-			'crowd',
 			'title',
 			'is_complete',
 			'comments',
@@ -401,7 +397,6 @@ class GroupSessionSerializerNoMembers(serializers.ModelSerializer):
 			return ClipSerializer(clips, many=True).data
 		return None
 
-	crowd = CrowdSerializerNoMembers()
 	comments = serializers.SerializerMethodField('get_comments')
 	likes = serializers.SerializerMethodField('get_likes')
 	clip_url = serializers.SerializerMethodField('get_most_recent_clip_url')
@@ -412,7 +407,6 @@ class GroupSessionSerializerNoMembers(serializers.ModelSerializer):
 		model = GroupSession
 		fields = (
 			'id',
-			'crowd',
 			'title',
 			'is_complete',
 			'comments',

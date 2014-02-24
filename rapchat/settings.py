@@ -77,7 +77,7 @@ else:
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 AWS_ACCESS_KEY_ID = 'AKIAJ2KVSZDJH7UPGAAQ'
 AWS_SECRET_ACCESS_KEY = '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'
-AWS_STORAGE_BUCKET_NAME = 'rapchat'
+AWS_STORAGE_BUCKET_NAME = 'rapback'
 
 
 
@@ -216,7 +216,7 @@ INSTALLED_APPS = (
     # My apps
     'users',
     'core',
-    'crowds',
+    # 'crowds',
     'groupsessions',
     'feedback',
     # 'video_stitching',

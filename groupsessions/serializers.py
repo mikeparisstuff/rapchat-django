@@ -1,6 +1,5 @@
 from rest_framework import serializers, pagination
 from groupsessions.models import GroupSession, Clip, Comment, Like
-from crowds.serializers import CrowdSerializer
 from users.serializers import ProfileSerializer
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -53,7 +52,6 @@ class GroupSessionSerializer(serializers.ModelSerializer):
 		return None
 
 
-	crowd = CrowdSerializer()
 	comments = serializers.SerializerMethodField('get_comments')
 	likes = serializers.SerializerMethodField('get_likes')
 	clip_url = serializers.SerializerMethodField('get_most_recent_clip_url')

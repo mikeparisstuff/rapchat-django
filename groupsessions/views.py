@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 
 from groupsessions.models import GroupSession, Clip, Comment, Like
 from rapchat.serializers import GroupSessionSerializer, ClipSerializer, CommentSerializer, LikeSerializer, PaginatedGroupSessionSerializer, PaginatedCompletedGroupSessionSerializer
-from crowds.models import Crowd
+# from crowds.models import Crowd
 from users.models import Profile
 from core.api import AuthenticatedView
 # from core.video_stitching import video_stitcher
@@ -17,44 +17,20 @@ class HandleSessions(AuthenticatedView):
 
 	def post(self, request, format=None):
 		'''
-		Create a GroupSession for the specified crowd
+		Create a GroupSession
 
 		title (required) -- The title for the rap session
-		use_existing_crowd (required) -- Boolean value. If true we will use 'crowd' else create a new crowd with 'members' and 'title'
 		clip (required) -- File. A file holding the clip to be added to the new session
-		crowd_title (depends) -- The title of the crowd to create and link to this session
-		crowd_members (depends) -- A json formatted list string of usernames to use as members for the crowd
-		crowd (depends) -- The id of the crowd to link the session to
 		'''
 		try:
-			crowd = None
-			print 'Request use_existing_crowd: {}'.format(request.DATA['use_existing_crowd'])
-			use_existing = request.DATA['use_existing_crowd']
-			if not isinstance(request.DATA['use_existing_crowd'], bool):
-				# The param is a string not a boolean
-				use_existing = False if request.DATA['use_existing_crowd'].lower() == 'false' else True
-			if not use_existing: 
-				usernames = json.loads(request.DATA['crowd_members'])
-				print 'USERNAMES: {}'.format(usernames)
-				profiles = Profile.objects.filter(user__username__in=usernames)
-				title = ''
-				if 'crowd_title' in request.DATA:
-					title = request.DATA['crowd_title']
-				crowd = Crowd.objects.create(
-					title = title
-				)
-				for item in profiles.all():
-					crowd.members.add(item)
-				crowd.members.add(request.user.get_profile())
-			if crowd is None:
-				crowd = Crowd.objects.get(pk=request.DATA['crowd'])
 			title = request.DATA['title']
+			prof = request.user.get_profile()
 			gs = GroupSession.objects.create(
-				crowd = crowd,
-				title = title
-			)		
+				title = title,
+				creator = prof
+			)
 
-			# Create a new clip for the newly created session
+			#Create Clip
 			f =  request.FILES['clip']
 			thumbnail = None
 			c = Clip(
@@ -77,17 +53,16 @@ class HandleSessions(AuthenticatedView):
 				status=status.HTTP_201_CREATED
 			)
 
-
 		except KeyError:
 			return Response(
-				{'error': 'New sessions require a title and crowd'},
+				{'error': 'New sessions require a title'},
 				status=status.HTTP_400_BAD_REQUEST
 			)
-		except Crowd.DoesNotExist:
-			return Response(
-				{'error': 'Could not find crowd with id {}'.format(request.DATA['crowd'])},
-				status=status.HTTP_404_NOT_FOUND
-			)
+		# except Crowd.DoesNotExist:
+		# 	return Response(
+		# 		{'error': 'Could not find crowd with id {}'.format(request.DATA['crowd'])},
+		# 		status=status.HTTP_404_NOT_FOUND
+		# 	)
 
 	def get(self, request, format=None):
 		'''
@@ -96,8 +71,7 @@ class HandleSessions(AuthenticatedView):
 		TODO: Filter the user data that gets send at this endpoint.
 		We probably don't want each users friend information to be being sent etc.
 		'''
-		user_crowds = request.user.get_profile().crowd_set.all()
-		sessions = GroupSession.objects.filter(crowd__in=user_crowds, is_complete=False).order_by('-modified')
+		sessions = GroupSession.objects.filter(is_complete=False).order_by('-modified')[:40]
 		
 
 		paginator = Paginator(sessions, 10)
@@ -124,8 +98,8 @@ class HandleSessions(AuthenticatedView):
 
 class HandleCompletedSessions(AuthenticatedView):
 	def get(self, request, format=None):
-		user_crowds = request.user.get_profile().crowd_set.all()
-		sessions = GroupSession.objects.filter(crowd__in=user_crowds, is_complete=True).order_by('-modified')
+		# user_crowds = request.user.get_profile().crowd_set.all()
+		sessions = GroupSession.objects.filter(is_complete=True).order_by('-modified')
 		
 
 		paginator = Paginator(sessions, 10)
@@ -167,7 +141,7 @@ class HandleClips(AuthenticatedView):
 		Add a clip to a session.
 
 		clip (required) -- The clip file to add to the session
-		thumbnail (required)  -- A jpg image file to serve as a thumbnail for the clipg
+		thumbnail (required)  -- A jpg image file to serve as a thumbnail for the clip
 		'''
 		try:
 			sesh = GroupSession.objects.get(pk=session)
@@ -185,10 +159,12 @@ class HandleClips(AuthenticatedView):
 			print 'Clip Created'
 			c.save()
 			print 'Clip Saved'
-			if sesh.num_clips() >= 4:
-				print 'Setting session {} as complete'
-				sesh.is_complete = True
-				sesh.save()
+
+			# MAKE SESSION COMPLETE
+			# if sesh.num_clips() >= 4:
+			# 	print 'Setting session {} as complete'
+			# 	sesh.is_complete = True
+			# 	sesh.save()
 			serializer = ClipSerializer(c)
 			
 			# Call the method to stitch the video if number of clips >= 4

@@ -4,16 +4,12 @@ from django.dispatch import receiver
 
 from datetime import datetime
 
-from crowds.models import Crowd
 from users.models import Profile
 
 class GroupSession(models.Model):
 	'''
 	Rapchat Session Model
 	'''
-	crowd = models.ForeignKey(
-		Crowd
-	)
 
 	title = models.CharField(
 		max_length=100
@@ -21,6 +17,13 @@ class GroupSession(models.Model):
 
 	is_complete = models.BooleanField(
 		default=False
+	)
+
+	session_creator = models.ForeignKey(
+		Profile,
+		blank = True,
+		null = True,
+		default = None
 	)
 
 	# video_url = models.URLField(
@@ -60,7 +63,7 @@ class GroupSession(models.Model):
 			return None
 
 	def __unicode__(self):
-		return 'Crowd: {}'.format(self.title)
+		return 'Session: {}'.format(self.title)
 
 
 
