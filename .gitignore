@@ -4,6 +4,7 @@
 *.log
 *.pot
 *.pyc
+.idea
 local_settings.py
 .DS_STORE
 >>>>>>> 66b5cc0bd71c2733b921514d9ac91314328c370b
