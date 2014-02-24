@@ -216,7 +216,7 @@ INSTALLED_APPS = (
     # My apps
     'users',
     'core',
-    # 'crowds',
+    'crowds',
     'groupsessions',
     'feedback',
     # 'video_stitching',
