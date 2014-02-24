@@ -27,7 +27,7 @@ class HandleSessions(AuthenticatedView):
 			prof = request.user.get_profile()
 			gs = GroupSession.objects.create(
 				title = title,
-				creator = prof
+				session_creator = prof
 			)
 
 			#Create Clip
