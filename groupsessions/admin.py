@@ -8,7 +8,6 @@ class GroupSessionAdmin(admin.ModelAdmin):
 	list_display = (
 		'id',
 		'title',
-		'crowd',
 		'is_complete',
 		'created'
 	)

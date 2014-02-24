@@ -4,7 +4,7 @@ from django.contrib import admin
 from rest_framework import routers
 
 from users import views as users_views
-from crowds import views as crowds_views
+# from crowds import views as crowds_views
 from groupsessions import views as sessions_views
 from feedback import views as feedback_views
 
@@ -36,7 +36,7 @@ urlpatterns = patterns('',
     url(r'^users/me/friends/requests/reply/$', users_views.HandleFriendRequestReplies.as_view(), name='handle_friend_request_replies'),
 
     # CROWDS ENDPOINTS
-    url(r'^users/me/crowds/$', crowds_views.HandleCrowds.as_view(), name='handle_crowds'),
+    # url(r'^users/me/crowds/$', crowds_views.HandleCrowds.as_view(), name='handle_crowds'),
 
     # SESSIONS ENDPOINTS
     url(r'^users/me/sessions/$', sessions_views.HandleSessions.as_view(), name='handle_sessions'),
