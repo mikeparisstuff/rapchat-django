@@ -117,7 +117,7 @@ class HandleSearch(AuthenticatedView):
 		try:
 			print 'search'
 			print 'Query Params: {}'.format(request.QUERY_PARAMS['username'])
-			profiles = User.objects.filter(username__icontains = request.QUERY_PARAMS['username'])
+			profiles = User.objects.filter(username__icontains = request.QUERY_PARAMS['username'], is_staff=False)
 			serializer = UserSerializer(profiles, many=True)
 			return Response({
 				'profiles': serializer.data
