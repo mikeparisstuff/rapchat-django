@@ -11,6 +11,8 @@ from users.models import Profile, FriendRequest
 from rapchat.serializers import ProfileSerializer, UserSerializer, FriendRequestSerializer, ProfileSerializerNoFriends, MyProfileSerializer, PublicProfileSerializer, LikeSerializerNoMembers
 from core.api import AuthenticatedView, UnauthenticatedView
 
+
+
 class WelcomePage(APIView):
 	def get(self, request, format=None):
 		return Response('Welcome to the Rapchat API.  Goto /api-docs/ for more details.')
@@ -117,7 +119,8 @@ class HandleSearch(AuthenticatedView):
 		try:
 			print 'search'
 			print 'Query Params: {}'.format(request.QUERY_PARAMS['username'])
-			profiles = User.objects.filter(username__icontains = request.QUERY_PARAMS['username'], is_staff=False)
+			profiles = User.objects.filter(username__icontains = request.QUERY_PARAMS['username'], is_staff=False).exclude(username = request.user.username)
+			print dir(profiles)
 			serializer = UserSerializer(profiles, many=True)
 			return Response({
 				'profiles': serializer.data
