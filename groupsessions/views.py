@@ -161,7 +161,7 @@ class HandleClips(AuthenticatedView):
 			print 'Clip Saved'
 
 			# MAKE SESSION COMPLETE
-			if sesh.num_clips() >= 6:
+			if sesh.num_clips() >= 4:
 				print 'Setting session {} as complete'
 				sesh.is_complete = True
 				sesh.save()
