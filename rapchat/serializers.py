@@ -3,6 +3,7 @@ from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework import serializers, pagination
 
 from groupsessions.models import GroupSession, Clip, Comment, Like
+# , BattleSession, BattleClip, BattleComment, BattleLike
 from users.models import Profile, FriendRequest
 # from crowds.models import Crowd
 
@@ -250,6 +251,7 @@ class GroupSessionSerializer(serializers.ModelSerializer):
 			'title',
 			'is_complete',
 			'comments',
+			'is_battle',
 			'likes',
 			'clip_url',
 			'thumbnail_url',
@@ -288,31 +290,31 @@ class GroupSessionSerializerUnkownStatus(serializers.ModelSerializer):
 			return None
 		return None
 
-		def get_clips(self, group_session):
-			if group_session:
-				clips = group_session.get_clips()
-				return ClipSerializer(clips, many=True).data
-			return None
+	def get_clips(self, group_session):
+		if group_session:
+			clips = group_session.get_clips()
+			return ClipSerializer(clips, many=True).data
+		return None
 
-		# crowd = CrowdSerializer()
-		comments = serializers.SerializerMethodField('get_comments')
-		clip_url = serializers.SerializerMethodField('get_most_recent_clip_url')
-		thumbnail_url = serializers.SerializerMethodField('get_most_recent_thumbnail_url')
-		likes = serializers.SerializerMethodField('get_likes')
-		clips = serializers.SerializerMethodField('get_clips')
+	# crowd = CrowdSerializer()
+	comments = serializers.SerializerMethodField('get_comments')
+	clip_url = serializers.SerializerMethodField('get_most_recent_clip_url')
+	thumbnail_url = serializers.SerializerMethodField('get_most_recent_thumbnail_url')
+	likes = serializers.SerializerMethodField('get_likes')
+	clips = serializers.SerializerMethodField('get_clips')
 
-		class Meta:
-			model = GroupSession
-			fields = (
-				'id',
-				'title',
-				'is_complete',
-				'comments',
-				'likes',
-				'clips',
-				'created',
-				'modified'	
-			)	
+	class Meta:
+		model = GroupSession
+		fields = (
+			'id',
+			'title',
+			'is_complete',
+			'comments',
+			'likes',
+			'clips',
+			'created',
+			'modified'	
+		)	
 
 class CompletedGroupSessionSerializer(serializers.ModelSerializer):
 
@@ -353,67 +355,6 @@ class CompletedGroupSessionSerializer(serializers.ModelSerializer):
 			'comments',
 			'likes',
 			'clips',
-			'created',
-			'modified'	
-		)
-
-
-
-class GroupSessionSerializerNoMembers(serializers.ModelSerializer):
-	# May be a cleaner way to get this relationship
-	# TODO: investigate
-	def get_comments(self, group_session):
-		if group_session:
-			return CommentSerializer(group_session.get_comments(), many=True).data
-		return None
-
-	def get_likes(self, group_session):
-		if group_session:
-			return group_session.like_set.all().count()
-		return None
-
-	def get_most_recent_clip_url(self, group_session):
-		if group_session:
-			clip = group_session.most_recent_clip()
-			if clip:
-				return clip.clip.url
-			return None
-		return None
-
-	def get_most_recent_thumbnail_url(self, group_session):
-		if group_session:
-			clip = group_session.most_recent_clip()
-			if clip:
-				try:
-					return clip.thumbnail.url
-				except ValueError:
-					return None
-			return None
-		return None
-
-	def get_clips(self, group_session):
-		if group_session:
-			clips = group_session.get_clips()
-			return ClipSerializer(clips, many=True).data
-		return None
-
-	comments = serializers.SerializerMethodField('get_comments')
-	likes = serializers.SerializerMethodField('get_likes')
-	clip_url = serializers.SerializerMethodField('get_most_recent_clip_url')
-	thumbnail_url = serializers.SerializerMethodField('get_most_recent_thumbnail_url')
-	clips = serializers.SerializerMethodField('get_clips')
-
-	class Meta:
-		model = GroupSession
-		fields = (
-			'id',
-			'title',
-			'is_complete',
-			'comments',
-			'likes',
-			'clip_url',
-			'clips',
-			'thumbnail_url',
 			'created',
 			'modified'	
 		)
@@ -473,20 +414,6 @@ class LikeSerializer(serializers.ModelSerializer):
 			'modified'
 		)
 
-class LikeSerializerNoMembers(serializers.ModelSerializer):
-	user = ProfileSerializer()
-	session = GroupSessionSerializerNoMembers()
-	username = serializers.Field(source='user.user.username')
-
-	class Meta:
-		model = Like
-		fields = (
-			'id',
-			'username',
-			'session',
-			'created'
-		)
-
 ######################################################################
 #  Public Profile Serializer
 ######################################################################
@@ -517,3 +444,150 @@ class PublicProfileSerializer(serializers.ModelSerializer):
 			'num_friends',
 			'num_raps'
 			)
+
+###############################################################
+#					Battle Session Serializer
+###############################################################
+
+# class BattleCommentSerializer(serializers.ModelSerializer):
+# 	commenter = serializers.Field(source='creator.user.username')
+
+# 	class Meta:
+# 		model = BattleComment
+# 		fields = (
+# 			'id',
+# 			'commenter',
+# 			'battle',
+# 			'text',
+# 			'created',
+# 			'modified'
+# 		)
+
+# class BattleSessionSerializer(serializers.ModelSerializer):
+
+# 	def get_round(self, battle_session):
+# 		if battle_session:
+# 			return battle_session.get_round()
+# 		return 0
+
+# 	def get_comments(self, battle_session):
+# 		if battle_session:
+# 			return BattleCommentSerializer(battle_session.get_comments(), many=True).data
+# 		return None
+
+# 	def get_likes(self, battle_session):
+# 		if battle_session:
+# 			return battle_session.num_clips()
+# 		return None
+
+# 	def get_most_recent_clip_url(self, battle_session):
+# 		if battle_session:
+# 			clip = battle_session.most_recent_clip()
+# 			if clip:
+# 				return clip.clip.url
+# 		return None
+
+# 	def get_most_recent_thumbnail_url(self, battle_session):
+# 		if battle_session:
+# 			clip = battle_session.most_recent_clip()
+# 			if clip:
+# 				return clip.thumbnail.url
+# 		return None
+
+# 	round_number = serializers.SerializerMethodField('get_round')
+# 	comments = serializers.SerializerMethodField('get_comments')
+# 	likes = serializers.SerializerMethodField('get_likes')
+# 	clip_url = serializers.SerializerMethodField('get_most_recent_clip_url')
+# 	thumbnail_url = serializers.SerializerMethodField('get_most_recent_thumbnail_url')
+
+# 	class Meta:
+# 		model = BattleSession
+# 		fields = (
+# 			'id',
+# 			'title',
+# 			'comments',
+# 			'likes',
+# 			'is_complete',
+# 			'clip_url',
+# 			'thumbnail_url',
+# 			'created',
+# 			'modified'
+# 		)
+
+# class CompletedBattleSessionSerializer(serializers.ModelSerializer):
+
+# 	def get_clips(self, battle_session):
+# 		if battle_session:
+# 			clips = battle_session.get_clips()
+# 			return ClipSerializer(clips, many=True).data
+# 		return None
+
+# 	clips = serializers.SerializerMethodField('get_clips')
+
+# 	class Meta:
+# 		model = BattleSession
+# 		fields = (
+# 			'id',
+# 			'title',
+# 			'is_complete',
+# 			'likes',
+# 			'clips',
+# 			'created',
+# 			'modified'
+# 		)
+
+
+# class PaginatedBattleSessionSerializer(pagination.PaginationSerializer):
+# 	'''
+# 	Serializes page objects of query sets
+# 	'''
+# 	class Meta:
+# 		object_serializer_class = BattleSessionSerializer
+
+# class PaginatedCompletedBattleSessionSerializer(pagination.PaginationSerializer):
+# 	'''
+# 	Serializes page objects of query sets
+# 	'''
+# 	class Meta:
+# 		object_serializer_class = CompletedBattleSessionSerializer
+
+# class BattleClipSerializer(serializers.ModelSerializer):
+
+# 	def get_url(self, clip):
+# 		return clip.clip.url
+
+# 	def get_thumbnail_url(self, clip):
+# 		if clip.thumbnail:
+# 			return clip.thumbnail.url
+# 		return None
+
+# 	url = serializers.SerializerMethodField('get_url')
+# 	thumbnail_url = serializers.SerializerMethodField('get_thumbnail_url')
+
+# 	class Meta:
+# 		model = BattleClip
+# 		fields = (
+# 			'id',
+# 			'clip',
+# 			'thumbnail_url',
+# 			'url',
+# 			'battle',
+# 			'clip_num',
+# 			'creator',
+# 			'created',
+# 			'modified'
+# 		)
+
+# class BattleLikeSerializer(serializers.ModelSerializer):
+# 	battle = BattleSessionSerializer()
+# 	username = serializers.Field(source='user.user.username')
+
+# 	class Meta:
+# 		model = BattleLike
+# 		fields = (
+# 			'id',
+# 			'username',
+# 			'battle',
+# 			'created',
+# 			'modified'
+# 		)

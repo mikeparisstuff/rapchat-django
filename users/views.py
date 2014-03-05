@@ -8,7 +8,8 @@ from rest_framework.authtoken.models import Token
 
 from django.contrib.auth.models import User
 from users.models import Profile, FriendRequest
-from rapchat.serializers import ProfileSerializer, UserSerializer, FriendRequestSerializer, ProfileSerializerNoFriends, MyProfileSerializer, PublicProfileSerializer, LikeSerializerNoMembers
+from rapchat.serializers import ProfileSerializer, UserSerializer, FriendRequestSerializer, ProfileSerializerNoFriends, MyProfileSerializer, PublicProfileSerializer, LikeSerializer
+# , LikeSerializerNoMembers
 from core.api import AuthenticatedView, UnauthenticatedView
 
 
@@ -97,7 +98,7 @@ class HandleUser(AuthenticatedView):
 			profile = user.get_profile()
 			prof_serializer = PublicProfileSerializer(profile)
 			likes = profile.get_likes()
-			likes_serializer = LikeSerializerNoMembers(likes, many=True)
+			likes_serializer = LikeSerializer(likes, many=True)
 			return Response({
 				'profile': prof_serializer.data,
 				'likes': likes_serializer.data
