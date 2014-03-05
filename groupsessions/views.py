@@ -33,12 +33,15 @@ class HandleGroupSessions(AuthenticatedView):
 		try:
 			title = request.DATA['title']
 			prof = request.user.get_profile()
+			print "REQUEST DATA: {}".format(request.DATA)
 
 			is_battle = request.DATA['is_battle']
 			if not isinstance(is_battle, bool):
 				# The param is a string not a boolean
+				print "is_battle not a bool and is {}".format(is_battle)
 				is_battle = False if is_battle.lower() == 'false' else True
 			if is_battle:
+				print "is_battle is true"
 				br_uname = request.DATA['battle_receiver']
 				br_prof = Profile.objects.get(user__username=br_uname)
 				gs = GroupSession.objects.create(
