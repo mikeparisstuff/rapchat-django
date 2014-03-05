@@ -37,9 +37,14 @@ class HandleGroupSessions(AuthenticatedView):
 
 			is_battle = request.DATA['is_battle']
 			if not isinstance(is_battle, bool):
+				if isinstance(is_battle, unicode):
+					is_battle = False if is_battle == u'0' else True
+				elif isinstance(is_battle, str):
+					is_battle = False if is_battle.lower() == 'false' else True
+				else:
+					is_battle = False
 				# The param is a string not a boolean
 				print "is_battle not a bool and is {}".format(is_battle)
-				is_battle = False if is_battle.lower() == 'false' else True
 			if is_battle:
 				print "is_battle is true"
 				br_uname = request.DATA['battle_receiver']
