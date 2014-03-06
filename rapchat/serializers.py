@@ -237,8 +237,9 @@ class GroupSessionSerializer(serializers.ModelSerializer):
 			return None
 		return None
 
-
 	# crowd = CrowdSerializer()
+	session_creator = ProfileSerializerNoFriends()
+	session_receiver = ProfileSerializerNoFriends()
 	comments = serializers.SerializerMethodField('get_comments')
 	likes = serializers.SerializerMethodField('get_likes')
 	clip_url = serializers.SerializerMethodField('get_most_recent_clip_url')
@@ -249,6 +250,8 @@ class GroupSessionSerializer(serializers.ModelSerializer):
 		fields = (
 			'id',
 			'title',
+			'session_creator',
+			'session_receiver',
 			'is_complete',
 			'comments',
 			'is_battle',
