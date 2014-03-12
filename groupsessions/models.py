@@ -62,6 +62,10 @@ class GroupSession(models.Model):
 		null = True
 	)
 
+	def get_round(self):
+		# Could be costly.. Maybe keep running tally
+		return (self.num_clips() / 2) + 1
+
 	def num_likes(self):
 		return self.like_set.count()
 

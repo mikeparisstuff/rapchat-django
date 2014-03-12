@@ -11,12 +11,15 @@ class HandleFeedback(AuthenticatedView):
 	def post(self, request, fromat=None):
 		'''
 		Create a new feedback message.
+
+		message (required) -- The message to create the feedback
 		'''
 		try:
 			creator = request.user.get_profile()
+			message = request.DATA['message']
 			feedback = FeedbackMessage.objects.create(
 				creator = creator,
-				message = request.DATA['message']
+				message = message
 			)
 			return Response(
 				{'detail': 'Successfully sent feedback'},

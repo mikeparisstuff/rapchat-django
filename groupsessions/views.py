@@ -35,7 +35,12 @@ class HandleGroupSessions(AuthenticatedView):
 			prof = request.user.get_profile()
 			print "REQUEST DATA: {}".format(request.DATA)
 
-			is_battle = request.DATA['is_battle']
+			# Check to see if is_battle is in the request
+			if 'is_battle' in request.DATA:
+				is_battle = request.DATA['is_battle']
+			else:
+				is_battle = False
+
 			if not isinstance(is_battle, bool):
 				if isinstance(is_battle, unicode):
 					is_battle = False if is_battle == u'0' else True
@@ -192,8 +197,13 @@ class HandleGroupSessionClips(AuthenticatedView):
 			c.save()
 			print 'Clip Saved'
 
+			# IF BATTLE WE HAVE A 3 ROUND BRAWL
+			if (sesh.is_battle and sesh.num_clips() >= 6):
+				print 'Setting battle {} as complete'
+				sesh.is_complete = True
+				sesh.save()
 			# MAKE SESSION COMPLETE
-			if sesh.num_clips() >= 4:
+			elif not sesh.is_battle and sesh.num_clips() >= 4:
 				print 'Setting session {} as complete'
 				sesh.is_complete = True
 				sesh.save()
