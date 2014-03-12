@@ -120,9 +120,9 @@ class HandleSearch(AuthenticatedView):
 		try:
 			print 'search'
 			print 'Query Params: {}'.format(request.QUERY_PARAMS['username'])
-			profiles = User.objects.filter(username__icontains = request.QUERY_PARAMS['username'], is_staff=False).exclude(username = request.user.username)
+			profiles = Profile.objects.filter(user__username__icontains = request.QUERY_PARAMS['username'], user__is_staff=False).exclude(user__username = request.user.username)
 			print dir(profiles)
-			serializer = UserSerializer(profiles, many=True)
+			serializer = ProfileSerializer(profiles, many=True)
 			return Response({
 				'profiles': serializer.data
 				}, status=status.HTTP_200_OK
