@@ -345,6 +345,8 @@ class CompletedGroupSessionSerializer(serializers.ModelSerializer):
 			return ClipSerializer(clips, many=True).data
 		return None
 
+	session_creator = ProfileSerializerNoFriends()
+	session_receiver = ProfileSerializerNoFriends()
 	comments = serializers.SerializerMethodField('get_comments')
 	likes = serializers.SerializerMethodField('get_likes')
 	clips = serializers.SerializerMethodField('get_clips')
@@ -355,6 +357,9 @@ class CompletedGroupSessionSerializer(serializers.ModelSerializer):
 			'id',
 			'title',
 			'is_complete',
+			'is_battle',
+			'session_creator',
+			'session_receiver',
 			'comments',
 			'likes',
 			'clips',
