@@ -4,9 +4,9 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from groupsessions.models import GroupSession, Clip, Comment, Like
+from groupsessions.models import GroupSession, Clip, Comment, Like, BattleVote
 # , BattleSession, BattleClip, BattleLike, BattleComment
-from rapchat.serializers import GroupSessionSerializer, ClipSerializer, CommentSerializer, LikeSerializer, PaginatedGroupSessionSerializer, PaginatedCompletedGroupSessionSerializer
+from rapchat.serializers import GroupSessionSerializer, ClipSerializer, CommentSerializer, LikeSerializer, PaginatedGroupSessionSerializer, PaginatedCompletedGroupSessionSerializer, VoteSerializer
 # from rapchat.serializers import PaginatedBattleSessionSerializer, BattleSessionSerializer
 from users.models import Profile
 from core.api import AuthenticatedView
@@ -43,6 +43,7 @@ class HandleGroupSessions(AuthenticatedView):
 
 			if not isinstance(is_battle, bool):
 				if isinstance(is_battle, unicode):
+					print
 					is_battle = False if is_battle == u'0' else True
 				elif isinstance(is_battle, str):
 					is_battle = False if is_battle.lower() == 'false' else True
@@ -375,261 +376,333 @@ class HandleUserLikes(AuthenticatedView):
 	def get(self, request, format=None, username=None):
 		pass
 
+class HandleBattleVotes(AuthenticatedView):
+
+	def post(self, request, format=None, session=None):
+		'''
+		Add a vote to a battle session.
+
+		session (required) -- This is supplied as a session_id in the url
+		voted_for (required) -- The username of the person being voted for
+		'''
+		try:
+			# Get the session
+			sesh = GroupSession.objects.get(pk=session)
+
+			# If the session is not a battle then stop
+			if not sesh.is_battle:
+				return Response({
+					'error': 'Error. This session is not a battle and you can only vote for a battle session.'
+					}, 
+					status = status.HTTP_400_BAD_REQUEST
+				)
+			elif not sesh.is_complete:
+				return Response({
+					'error': 'Error. You can only vote on completed battles.'
+					}, 
+					status = status.HTTP_400_BAD_REQUEST
+				)
+
+			# Get person being voted for
+			vote_for_username = request.DATA['voted_for']
+			if sesh.session_creator.user.username == vote_for_username:
+				vote_for = sesh.session_creator
+				is_for_creator = True
+			elif sesh.session_receiver.user.username == vote_for_username:
+				vote_for = sesh.session_receiver
+				is_for_creator = False
+			else:
+				return Response({
+					'error': 'Error. Cannot vote for a user that is not involved in this battle'
+					},
+					status = status.HTTP_400_BAD_REQUEST
+				)
+				
+			# If we have a valid sesh and vote_for profile then create the vote
+			vote = BattleVote.objects.create(
+				battle = sesh,
+				voter = request.user.get_profile(),
+				voted_for = vote_for,
+				is_for_creator = is_for_creator
+			)
+
+			# vote_serializer = VoteSerializer(vote)
+			votes = sesh.get_vote_count();
+			return Response({
+				'votes': {'votes_for_creator': votes[0], 'votes_for_receiver': votes[1]} ,
+				'detail': 'Successfully voted for {} in session {}'.format(vote_for.user.username, sesh.title)
+				},
+				status=status.HTTP_201_CREATED
+			)
+		except KeyError as ke:
+			return Response({
+				'error': 'Error creating vote: {} is a required field'.format(ke)
+				},
+				status=status.HTTP_400_BAD_REQUEST
+			)
+		except GroupSession.DoesNotExist:
+			return Response({
+				'error': 'Error creating vote. Could not find GroupSession with id: {}'.format(session)
+				},
+				status = status.HTTP_400_BAD_REQUEST
+			)
+
 
 ####################################################################### 
 #						BATTLE SESSIONS 
 #######################################################################
 
-class HandleBattleSessions(AuthenticatedView):
+# class HandleBattleSessions(AuthenticatedView):
 
-	def post(self, request, format=None):
-		'''
-		Create a BattleSession
+# 	def post(self, request, format=None):
+# 		'''
+# 		Create a BattleSession
 
-		title (required) -- The title for the rap session
-		clip (required) -- File. A file holding the clip to be added to the new session
-		battle_receiver (required) -- The username of the person being sent the battle
-		'''
-		try:
+# 		title (required) -- The title for the rap session
+# 		clip (required) -- File. A file holding the clip to be added to the new session
+# 		battle_receiver (required) -- The username of the person being sent the battle
+# 		'''
+# 		try:
 
-			# Create Battle Session
+# 			# Create Battle Session
 
-			title = request.DATA['title']
-			prof = request.user.get_profile()
-			recv_uname = request.DATA['battle_receiver']
-			receiver = Profile.objects.get(user__username=recv_uname)
-			battle = BattleSession.objects.create(
-				title = title,
-				battle_receiver = receiver,
-				battle_creator = prof
-			)
+# 			title = request.DATA['title']
+# 			prof = request.user.get_profile()
+# 			recv_uname = request.DATA['battle_receiver']
+# 			receiver = Profile.objects.get(user__username=recv_uname)
+# 			battle = BattleSession.objects.create(
+# 				title = title,
+# 				battle_receiver = receiver,
+# 				battle_creator = prof
+# 			)
 
-			# Create BattleClip
-			f = request.FILES['clip']
-			c = BattleClip(
-				creator = prof,
-				battle = battle,
-				clip_num = battle.num_clips()+1
-			)
-			if 'thumbnail' in request.FILES:
-				thumbnail = request.FILES['thumbnail']
-				c.thumbnail = thumbnail
-			c.clip = f
-			c.save()
-			serializer = BattleSessionSerializer(battle)
-			return Response(
-				{'battle_session': serializer.data},
-				status=status.HTTP_201_CREATED
-			)
-		except KeyError:
-			return Response(
-				{'error': 'New Battles require a title, receiver, and clip'},
-				status=status.HTTP_400_BAD_REQUEST
-			)
-		except Profile.DoesNotExist:
-			return Response(
-				{'error': 'Could not find profile with username {}'.format(request.DATA['battle_receiver'])},
-				status=status.HTTP_400_BAD_REQUEST
-			)
+# 			# Create BattleClip
+# 			f = request.FILES['clip']
+# 			c = BattleClip(
+# 				creator = prof,
+# 				battle = battle,
+# 				clip_num = battle.num_clips()+1
+# 			)
+# 			if 'thumbnail' in request.FILES:
+# 				thumbnail = request.FILES['thumbnail']
+# 				c.thumbnail = thumbnail
+# 			c.clip = f
+# 			c.save()
+# 			serializer = BattleSessionSerializer(battle)
+# 			return Response(
+# 				{'battle_session': serializer.data},
+# 				status=status.HTTP_201_CREATED
+# 			)
+# 		except KeyError:
+# 			return Response(
+# 				{'error': 'New Battles require a title, receiver, and clip'},
+# 				status=status.HTTP_400_BAD_REQUEST
+# 			)
+# 		except Profile.DoesNotExist:
+# 			return Response(
+# 				{'error': 'Could not find profile with username {}'.format(request.DATA['battle_receiver'])},
+# 				status=status.HTTP_400_BAD_REQUEST
+# 			)
 
-	def get(self, request, format=None):
-		'''
-		Return a list of battles for the currently logged in user.
-		'''
-		battles = BattleSession.objects.filter(is_complete=False).order_by('-modified')
+# 	def get(self, request, format=None):
+# 		'''
+# 		Return a list of battles for the currently logged in user.
+# 		'''
+# 		battles = BattleSession.objects.filter(is_complete=False).order_by('-modified')
 
-		paginator = Paginator(battles, 8)
-		page = request.QUERY_PARAMS.get('page')
+# 		paginator = Paginator(battles, 8)
+# 		page = request.QUERY_PARAMS.get('page')
 
-		try:
-			battles = paginator.page(page)
-		except PageNotAnInteger:
-			battles = paginator.page(1)
-		except EmptyPage:
-			battles = paginator.page(paginator.num_pages)
+# 		try:
+# 			battles = paginator.page(page)
+# 		except PageNotAnInteger:
+# 			battles = paginator.page(1)
+# 		except EmptyPage:
+# 			battles = paginator.page(paginator.num_pages)
 
-		serializer_context = {'request': request}
-		serializer = PaginatedBattleSessionSerializer(battles, context=serializer_context)
-		return Response(
-			serializer.data,
-			status=status.HTTP_200_OK
-		)
+# 		serializer_context = {'request': request}
+# 		serializer = PaginatedBattleSessionSerializer(battles, context=serializer_context)
+# 		return Response(
+# 			serializer.data,
+# 			status=status.HTTP_200_OK
+# 		)
 
-class HandleCompletedBattleSessions(AuthenticatedView):
-	def get(self, request, format=None):
-		'''
-		Return a list of completed battle sessions.
-		'''
-		battles = BattleSession.objects.filter(is_complete=True).order_by('-modified')
+# class HandleCompletedBattleSessions(AuthenticatedView):
+# 	def get(self, request, format=None):
+# 		'''
+# 		Return a list of completed battle sessions.
+# 		'''
+# 		battles = BattleSession.objects.filter(is_complete=True).order_by('-modified')
 
-		paginator = Paginator(battles, 8)
-		page = request.QUERY_PARAMS.get('page')
-		try:
-			battles = paginator.page(page)
-		except PageNotAnInteger:
-			battles = paginator.page(1)
-		except EmptyPage:
-			battles = paginator.page(paginator.num_pages)
+# 		paginator = Paginator(battles, 8)
+# 		page = request.QUERY_PARAMS.get('page')
+# 		try:
+# 			battles = paginator.page(page)
+# 		except PageNotAnInteger:
+# 			battles = paginator.page(1)
+# 		except EmptyPage:
+# 			battles = paginator.page(paginator.num_pages)
 
-		serializer_context = {'request': request}
-		serializer = PaginatedCompletedBattleSessionSerializer(battles, context=serializer_context)
-		return Response(serializer.data, status=status.HTTP_200_OK)
+# 		serializer_context = {'request': request}
+# 		serializer = PaginatedCompletedBattleSessionSerializer(battles, context=serializer_context)
+# 		return Response(serializer.data, status=status.HTTP_200_OK)
 
-class HandleBattleSessionClips(AuthenticatedView):
 
-	def post(self, request, format=None, battle=None):
-		'''
-		Add a clip to a battle session
 
-		clip (required) -- The clip file to add to the battle
-		thumbnail (required) -- A jpg image file to serve as a thumbnail for the clip
-		'''
-		try:
-			battle = BattleSession.objects.get(pk=battle)
-			f = request.FILES['clip']
-			c = BattleClip(
-				clip_num = battle.num_clips()+1,
-				battle = battle,
-				creator = request.user.get_profile()
-			)
-			c.clip = f
-			if 'thumbnail' in request.FILES:
-				thumbnail = request.FILES['thumbnail']
-				c.thumbnail = thumbnail
-			c.save()
+# class HandleBattleSessionClips(AuthenticatedView):
 
-			if battle.num_clips() >= 6:
-				battle.is_complete = True
-				battle.save()
+# 	def post(self, request, format=None, battle=None):
+# 		'''
+# 		Add a clip to a battle session
 
-			serializer = BattleClipSerializer(c)
+# 		clip (required) -- The clip file to add to the battle
+# 		thumbnail (required) -- A jpg image file to serve as a thumbnail for the clip
+# 		'''
+# 		try:
+# 			battle = BattleSession.objects.get(pk=battle)
+# 			f = request.FILES['clip']
+# 			c = BattleClip(
+# 				clip_num = battle.num_clips()+1,
+# 				battle = battle,
+# 				creator = request.user.get_profile()
+# 			)
+# 			c.clip = f
+# 			if 'thumbnail' in request.FILES:
+# 				thumbnail = request.FILES['thumbnail']
+# 				c.thumbnail = thumbnail
+# 			c.save()
 
-			return Response({
-				'battle_clip': serializer.data
-				},
-				status=status.HTTP_200_OK
-			)
-		except KeyError:
-			return Response(
-				{'error': 'A clip file is required to add a clip to a battle'},
-				status=status.HTTP_400_BAD_REQUEST
-			)
-		except BattleSession.DoesNotExist:
-			return Response(
-				{'error': 'The battle with id [} could not be found'.format(battle)},
-				status=status.HTTP_404_NOT_FOUND
-			)
+# 			if battle.num_clips() >= 6:
+# 				battle.is_complete = True
+# 				battle.save()
 
-	def get(self, request, format=None, battle=None):
-		'''
-		Return data on each of the clips for the battle specified in the url.
-		'''
-		try:
-			clips = BattleClip.objects.filter(battle=battle)
-			serializer = BattleClipSerializer(clips, many=True)
-			return Response(
-				{'battle_clips': serializer.data},
-				status=status.HTTP_200_OK
-			)
-		except BattleClip.DoesNotExist:
-			return Response({
-				'error': 'Could not find any battle clips for battle: {}'.format(battle)
-				},
-				status=status.HTTP_400_BAD_REQUEST
-			)
+# 			serializer = BattleClipSerializer(c)
 
-class HandleBattleSessionComments(AuthenticatedView):
+# 			return Response({
+# 				'battle_clip': serializer.data
+# 				},
+# 				status=status.HTTP_200_OK
+# 			)
+# 		except KeyError:
+# 			return Response(
+# 				{'error': 'A clip file is required to add a clip to a battle'},
+# 				status=status.HTTP_400_BAD_REQUEST
+# 			)
+# 		except BattleSession.DoesNotExist:
+# 			return Response(
+# 				{'error': 'The battle with id [} could not be found'.format(battle)},
+# 				status=status.HTTP_404_NOT_FOUND
+# 			)
 
-	def post(self, request, format=None, battle=None):
-		'''
-		Add a comment to a battle session
+# 	def get(self, request, format=None, battle=None):
+# 		'''
+# 		Return data on each of the clips for the battle specified in the url.
+# 		'''
+# 		try:
+# 			clips = BattleClip.objects.filter(battle=battle)
+# 			serializer = BattleClipSerializer(clips, many=True)
+# 			return Response(
+# 				{'battle_clips': serializer.data},
+# 				status=status.HTTP_200_OK
+# 			)
+# 		except BattleClip.DoesNotExist:
+# 			return Response({
+# 				'error': 'Could not find any battle clips for battle: {}'.format(battle)
+# 				},
+# 				status=status.HTTP_400_BAD_REQUEST
+# 			)
 
-		text (required) -- The text of the comment
-		'''
-		try:
-			battle = BattleSession.objects.get(pk = battle)
-			comment = BattleComment.objects.create(
-				battle = battle,
-				creator = request.user.get_profile(),
-				text = request.DATA['text']
-			)
-			serializer = BattleCommentSerializer(comment)
-			return Response({
-				'battle_comment': serializer.data,
-				'detail': 'Successfully added comment to battle {}'.format(battle.id)
-				},
-				status=status.HTTP_400_BAD_REQUEST
-			)
-		except KeyError:
-			return Response({
-				'error': 'Error creating comment. Comments need text.'
-				},
-				status=status.HTTP_400_BAD_REQUEST
-			)
+# class HandleBattleSessionComments(AuthenticatedView):
 
-	def get(self, request, format=None, battle=None):
-		'''
-		Get all of a battles comments.
+# 	def post(self, request, format=None, battle=None):
+# 		'''
+# 		Add a comment to a battle session
 
-		battle (required) -- The id of the battle. This must be included in the url e.g. /battles/comments/1/
-		would refer to the session with id == 1s
-		'''
-		try:
-			battle = BattleSession.objects.get(pk=battle)
-			comments = battle.get_comments()
-			serializer = BattleCommentSerializer(comments, many=True)
-			return Response({
-				'comments': serializer.data
-				},
-				status=status.HTTP_200_OK
-			)
-		except KeyError:
-			return Response({
-				'error': 'Need a session to find battles for'
-				},
-				status=status.HTTP_404_NOT_FOUND
-			)
-		except BattleSession.DoesNotExist:
-			return Response({
-				'error': 'Sorry, we could not find that battle'
-				},
-				status=status.HTTP_400_NOT_FOUND
-			)
+# 		text (required) -- The text of the comment
+# 		'''
+# 		try:
+# 			battle = BattleSession.objects.get(pk = battle)
+# 			comment = BattleComment.objects.create(
+# 				battle = battle,
+# 				creator = request.user.get_profile(),
+# 				text = request.DATA['text']
+# 			)
+# 			serializer = BattleCommentSerializer(comment)
+# 			return Response({
+# 				'battle_comment': serializer.data,
+# 				'detail': 'Successfully added comment to battle {}'.format(battle.id)
+# 				},
+# 				status=status.HTTP_400_BAD_REQUEST
+# 			)
+# 		except KeyError:
+# 			return Response({
+# 				'error': 'Error creating comment. Comments need text.'
+# 				},
+# 				status=status.HTTP_400_BAD_REQUEST
+# 			)
+
+# 	def get(self, request, format=None, battle=None):
+# 		'''
+# 		Get all of a battles comments.
+
+# 		battle (required) -- The id of the battle. This must be included in the url e.g. /battles/comments/1/
+# 		would refer to the session with id == 1s
+# 		'''
+# 		try:
+# 			battle = BattleSession.objects.get(pk=battle)
+# 			comments = battle.get_comments()
+# 			serializer = BattleCommentSerializer(comments, many=True)
+# 			return Response({
+# 				'comments': serializer.data
+# 				},
+# 				status=status.HTTP_200_OK
+# 			)
+# 		except KeyError:
+# 			return Response({
+# 				'error': 'Need a session to find battles for'
+# 				},
+# 				status=status.HTTP_404_NOT_FOUND
+# 			)
+# 		except BattleSession.DoesNotExist:
+# 			return Response({
+# 				'error': 'Sorry, we could not find that battle'
+# 				},
+# 				status=status.HTTP_400_NOT_FOUND
+# 			)
 
 			
-class HandleBattleSessionLikes(AuthenticatedView):
-	def post(self, request, format=None):
-		'''
-		Add a like to a battle
+# class HandleBattleSessionLikes(AuthenticatedView):
+# 	def post(self, request, format=None):
+# 		'''
+# 		Add a like to a battle
 
-		battle (required) -- The id of the battle to add teh comment to
-		'''
-		try:
-			battle = BattleSession.objects.get(id=request.DATA['battle'])
-			like = BattleLike.objects.get(
-				user = request.user.get_profile(),
-				battle = battle
-			)
-			like.delete()
-			return Response({
-				'battle_lie': {'detail: Successfully deleted like'}
-				}, status=status.HTTP_200_OK
-			)
-		except BattleLike.DoesNotExist:
-			like = BattleLike.objects.create(
-				user = request.user.get_profile(),
-				battle = battle
-			)
-			serializer = BattleLikeSerializer(like)
-			return Response({
-				'battle_like': serializer.data
-				},
-				status=status.HTTP_201_CREATED
-			)
-		except KeyError:
-			return Response({
-				'detail': 'Failed to create battle_like'
-				},
-				status=status.HTTP_400_BAD_REQUEST
-			)
-
+# 		battle (required) -- The id of the battle to add teh comment to
+# 		'''
+# 		try:
+# 			battle = BattleSession.objects.get(id=request.DATA['battle'])
+# 			like = BattleLike.objects.get(
+# 				user = request.user.get_profile(),
+# 				battle = battle
+# 			)
+# 			like.delete()
+# 			return Response({
+# 				'battle_lie': {'detail: Successfully deleted like'}
+# 				}, status=status.HTTP_200_OK
+# 			)
+# 		except BattleLike.DoesNotExist:
+# 			like = BattleLike.objects.create(
+# 				user = request.user.get_profile(),
+# 				battle = battle
+# 			)
+# 			serializer = BattleLikeSerializer(like)
+# 			return Response({
+# 				'battle_like': serializer.data
+# 				},
+# 				status=status.HTTP_201_CREATED
+# 			)
+# 		except KeyError:
+# 			return Response({
+# 				'detail': 'Failed to create battle_like'
+# 				},
+# 				status=status.HTTP_400_BAD_REQUEST
+# 			)

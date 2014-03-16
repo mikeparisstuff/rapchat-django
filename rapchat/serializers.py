@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework import serializers, pagination
 
-from groupsessions.models import GroupSession, Clip, Comment, Like
+from groupsessions.models import GroupSession, Clip, Comment, Like, BattleVote
 # , BattleSession, BattleClip, BattleComment, BattleLike
 from users.models import Profile, FriendRequest
 # from crowds.models import Crowd
@@ -345,11 +345,18 @@ class CompletedGroupSessionSerializer(serializers.ModelSerializer):
 			return ClipSerializer(clips, many=True).data
 		return None
 
+	def vote_count(self, group_session):
+		if group_session.is_battle:
+			votes = group_session.get_vote_count()
+			return { 'for_creator': votes[0], 'for_receiver': votes[1] }
+		return None
+
 	session_creator = ProfileSerializerNoFriends()
 	session_receiver = ProfileSerializerNoFriends()
 	comments = serializers.SerializerMethodField('get_comments')
 	likes = serializers.SerializerMethodField('get_likes')
 	clips = serializers.SerializerMethodField('get_clips')
+	votes = serializers.SerializerMethodField('vote_count')
 
 	class Meta:
 		model = GroupSession
@@ -360,6 +367,7 @@ class CompletedGroupSessionSerializer(serializers.ModelSerializer):
 			'is_battle',
 			'session_creator',
 			'session_receiver',
+			'votes',
 			'comments',
 			'likes',
 			'clips',
@@ -452,6 +460,29 @@ class PublicProfileSerializer(serializers.ModelSerializer):
 			'num_friends',
 			'num_raps'
 			)
+
+#######################################################################
+#   Vote Serializers
+#######################################################################
+
+class VoteSerializer(serializers.ModelSerializer):
+
+	voter = ProfileSerializerNoFriends()
+	voted_for = ProfileSerializerNoFriends()
+	battle = GroupSessionSerializer()
+
+	class Meta:
+		model = BattleVote
+		fields = (
+			'id',
+			'voter',
+			'voted_for',
+			'battle',
+			'created',
+			'modified'
+		)
+
+
 
 ###############################################################
 #					Battle Session Serializer

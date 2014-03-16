@@ -84,6 +84,23 @@ class GroupSession(models.Model):
 		except Clip.DoesNotExist:
 			return None
 
+	def get_vote_count(self):
+		'''
+		Return a tuple containing the number of votes for the creator and receiver or None if this isn't a battle.
+		(votes_for_creator, votes_for_receiver)
+		'''
+		if self.is_battle:
+			def update_vote(acc, vote):
+				if vote.is_for_creator:
+					return (acc[0]+1, acc[1])
+				else:
+					return (acc[0], acc[1]+1)
+			votes = self.battlevote_set.all()
+			return reduce( update_vote, votes, (0,0))
+		else:
+			return (None, None)
+
+
 	def __unicode__(self):
 		return 'Session: {}'.format(self.title)
 
@@ -210,6 +227,43 @@ class Like(models.Model):
 	def __unicode__(self):
 		return 'Like: {}'.format(self.session.title)
 
+class BattleVote(models.Model):
+	'''
+	Register votes for battles
+	'''
+	voter = models.ForeignKey(
+		Profile,
+		related_name = "voter_set"
+	)
+
+	voted_for = models.ForeignKey(
+		Profile,
+		related_name = "voted_for_set"
+	)
+
+	battle = models.ForeignKey(
+		GroupSession
+	)
+
+	# A helper field to speed up tallying votes
+	is_for_creator = models.BooleanField(
+		default = True
+	)
+
+	created = models.DateTimeField(
+		auto_now_add = True,
+		blank=True,
+		null=True
+	)
+
+	modified = models.DateTimeField(
+		auto_now = True,
+		blank = True,
+		null = True
+	)
+
+	def __unicode__(self):
+		return 'Vote: {}'.format(self.battle.title)	
 
 ############################# BATTLES ##################################
 
