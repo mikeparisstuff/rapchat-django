@@ -26,6 +26,7 @@ urlpatterns = patterns('',
     url(r'^users/me/$', users_views.HandleMyProfile.as_view(), name='get_my_user'),
     url(r'^users/me/likes/$', sessions_views.HandleGroupSessionLikes.as_view(), name='get_my_likes'),
     url(r'^users/me/clips/$', sessions_views.HandleMyGroupSessionClips.as_view(), name='get_my_clips'),
+    url(r'^users/me/votes/$', users_views.HandleVotes.as_view(), name='handle_my_votes'),
     url(r'^users/obtain-token/$', 'rest_framework.authtoken.views.obtain_auth_token'),
     url(r'^invite/$', users_views.HandleInvites.as_view(), name='invite_users'),
     

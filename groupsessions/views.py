@@ -59,6 +59,7 @@ class HandleGroupSessions(AuthenticatedView):
 					title = title,
 					session_creator = prof,
 					session_receiver = br_prof,
+					waiting_on_username = br_uname,
 					is_battle = True
 				)
 			else:
@@ -109,8 +110,19 @@ class HandleGroupSessions(AuthenticatedView):
 		TODO: Filter the user data that gets send at this endpoint.
 		We probably don't want each users friend information to be being sent etc.
 		'''
-		sessions = GroupSession.objects.filter(is_complete=False).order_by('-modified')[:40]
-		
+		sessions = GroupSession.objects.filter(is_complete=False).order_by('-modified')[:36]
+
+		uname = request.user.username
+		# Filter out the sessions that we do not want
+		def filter_out(sesh):
+			if sesh.is_battle and sesh.waiting_on_username == uname:
+				return True
+			elif not sesh.is_battle:
+				return True
+			else:
+				return False
+
+		sessions = filter(filter_out, sessions)
 
 		paginator = Paginator(sessions, 8)
 		page = request.QUERY_PARAMS.get('page')
@@ -183,12 +195,16 @@ class HandleGroupSessionClips(AuthenticatedView):
 		'''
 		try:
 			sesh = GroupSession.objects.get(pk=session)
+			user = request.user
+			profile = user.get_profile()
+			if sesh.is_battle:
+				sesh.toggle_waiting_on(user.username)
 			f =  request.FILES['clip']
 			thumbnail = None
 			c = Clip(
 				clip_num = sesh.num_clips()+1,
 				session = sesh,
-				creator = request.user.get_profile()
+				creator = profile
 			)
 			c.clip = f
 			if 'thumbnail' in request.FILES:

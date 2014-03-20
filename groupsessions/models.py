@@ -44,6 +44,13 @@ class GroupSession(models.Model):
 		default = False
 	)
 
+	waiting_on_username = models.CharField(
+		max_length = 50,
+		default = None,
+		blank = True,
+		null = True
+	)
+
 	# video_url = models.URLField(
 	# 	default = '',
 	# 	blank = True,
@@ -61,6 +68,17 @@ class GroupSession(models.Model):
 		blank = True,
 		null = True
 	)
+
+
+	def toggle_waiting_on(self, last_added_clip_username):
+		if last_added_clip_username == self.session_creator.user.username:
+			self.waiting_on_username = self.session_receiver.user.username
+		elif self.waiting_on_username == self.session_receiver.user.username:
+			self.waiting_on_username = self.session_creator.user.username
+		else:
+			# This should never occur but if it does leave the field unchanged
+			pass
+		self.save()
 
 	def get_round(self):
 		# Could be costly.. Maybe keep running tally

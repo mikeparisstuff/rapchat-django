@@ -32,16 +32,26 @@ import dj_database_url
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 if INSTANCE_ID == 'LOCAL_VAGRANT':
+    # DATABASES = {
+    #     'default': {
+    #         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+    #         'NAME': 'rapchat_dev',                      # Or path to database file if using sqlite3.
+    #         # The following settings are not used with sqlite3:
+    #         'TEST_NAME': 'rapchat_test',
+    #         'USER': 'django_login',
+    #         'PASSWORD': 'django_login',
+    #         'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+    #         'PORT': '',                      # Set to empty string for default.
+    #     }
+    # }
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-            'NAME': 'rapchat_dev',                      # Or path to database file if using sqlite3.
-            # The following settings are not used with sqlite3:
-            'TEST_NAME': 'rapchat_test',
-            'USER': 'django_login',
-            'PASSWORD': 'django_login',
-            'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-            'PORT': '',                      # Set to empty string for default.
+        'default' : {
+            'ENGINE' : 'django.db.backends.postgresql_psycopg2',
+            'NAME' : 'd20vr0sil2d4oe',
+            'USER' : 'ryatbdsdjdnvzu',
+            'HOST' : 'ec2-54-235-152-22.compute-1.amazonaws.com',
+            'PORT' : '5432',
+            'PASSWORD' : 'i5RJ664vXlOZ2KOj8lBSUFWz-s'
         }
     }
 elif INSTANCE_ID == 'HEROKU':
