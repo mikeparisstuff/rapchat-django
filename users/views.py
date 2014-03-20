@@ -338,7 +338,7 @@ class HandleVotes(AuthenticatedView):
 		profile = request.user.get_profile()
 		votes = profile.voter_set.all()
 		def id_from_vote(acc, vote):
-			acc.add(vote.id)
+			acc.add(vote.battle.id)
 			return acc
 
 		vote_ids = reduce( id_from_vote, votes, set())
