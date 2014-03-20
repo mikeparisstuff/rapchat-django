@@ -348,7 +348,7 @@ class CompletedGroupSessionSerializer(serializers.ModelSerializer):
 	def vote_count(self, group_session):
 		if group_session.is_battle:
 			votes = group_session.get_vote_count()
-			return { 'for_creator': votes[0], 'for_receiver': votes[1] }
+			return { 'votes_for_creator': votes[0], 'votes_for_receiver': votes[1] }
 		return None
 
 	session_creator = ProfileSerializerNoFriends()
