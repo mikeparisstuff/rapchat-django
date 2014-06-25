@@ -16,7 +16,7 @@ import json
 
 
 ####################################################################
-#					 	GROUP SESSIONS 
+#					 	GROUP SESSIONS
 ####################################################################
 
 class HandleGroupSessions(AuthenticatedView):
@@ -26,8 +26,8 @@ class HandleGroupSessions(AuthenticatedView):
 		Create a GroupSession
 
 		title (required) -- The title for the rap session
-		is_battle (required) -- Boolean indicating whether or not this is a new battle
-		battle_receiver (optional) -- If is_battle this is required. Gives username of person being battled
+		is_private (required) -- Boolean indicating whether or not this is a new battle
+		message_receiver (optional) -- If is_battle this is required. Gives username of person being battled
 		clip (required) -- File. A file holding the clip to be added to the new session
 		'''
 		try:
@@ -36,23 +36,23 @@ class HandleGroupSessions(AuthenticatedView):
 			print "REQUEST DATA: {}".format(request.DATA)
 
 			# Check to see if is_battle is in the request
-			if 'is_battle' in request.DATA:
-				is_battle = request.DATA['is_battle']
+			if 'is_private' in request.DATA:
+				is_private = request.DATA['is_private']
 			else:
-				is_battle = False
+				is_private = False
 
-			if not isinstance(is_battle, bool):
-				if isinstance(is_battle, unicode):
+			if not isinstance(is_private, bool):
+				if isinstance(is_private, unicode):
 					print
-					is_battle = False if is_battle == u'0' else True
-				elif isinstance(is_battle, str):
-					is_battle = False if is_battle.lower() == 'false' else True
+					is_private = False if is_private == u'0' else True
+				elif isinstance(is_private, str):
+					is_private = False if is_private.lower() == 'false' else True
 				else:
-					is_battle = False
+					is_private = False
 				# The param is a string not a boolean
-				print "is_battle not a bool and is {}".format(is_battle)
-			if is_battle:
-				print "is_battle is true"
+				print "is_private not a bool and is {}".format(is_private)
+			if is_private:
+				print "is_private is true"
 				br_uname = request.DATA['battle_receiver']
 				br_prof = Profile.objects.get(user__username=br_uname)
 				gs = GroupSession.objects.create(
@@ -60,26 +60,26 @@ class HandleGroupSessions(AuthenticatedView):
 					session_creator = prof,
 					session_receiver = br_prof,
 					waiting_on_username = br_uname,
-					is_battle = True
+					is_private = True
 				)
 			else:
 				gs = GroupSession.objects.create(
 					title = title,
 					session_creator = prof,
-					is_battle = False
+					is_private = False
 				)
 
 			#Create Clip
 			f =  request.FILES['clip']
-			thumbnail = None
+			waveform = None
 			c = Clip(
 				clip_num = gs.num_clips()+1,
 				session = gs,
 				creator = request.user.get_profile()
 			)
-			if 'thumbnail' in request.FILES:
-				thumbnail = request.FILES['thumbnail']
-				c.thumbnail = thumbnail
+			if 'waveform' in request.FILES:
+				waveform = request.FILES['waveform']
+				c.waveform = waveform
 			c.clip = f
 			print 'Clip Created'
 			c.save()
@@ -110,19 +110,9 @@ class HandleGroupSessions(AuthenticatedView):
 		TODO: Filter the user data that gets send at this endpoint.
 		We probably don't want each users friend information to be being sent etc.
 		'''
-		sessions = GroupSession.objects.filter(is_complete=False).order_by('-modified')[:36]
+		sessions = GroupSession.objects.filter(is_private=False).order_by('-modified')[:36]
 
 		uname = request.user.username
-		# Filter out the sessions that we do not want
-		def filter_out(sesh):
-			if sesh.is_battle and sesh.waiting_on_username == uname:
-				return True
-			elif not sesh.is_battle:
-				return True
-			else:
-				return False
-
-		sessions = filter(filter_out, sessions)
 
 		paginator = Paginator(sessions, 8)
 		page = request.QUERY_PARAMS.get('page')
@@ -136,6 +126,7 @@ class HandleGroupSessions(AuthenticatedView):
 			# if page is out of range, return last page
 			sessions = paginator.page(paginator.num_pages)
 
+
 		serializer_context = {'request': request}
 		serializer = PaginatedGroupSessionSerializer(sessions, context=serializer_context)
 		return Response(serializer.data, status=status.HTTP_200_OK)
@@ -146,11 +137,44 @@ class HandleGroupSessions(AuthenticatedView):
 		# 	status=status.HTTP_200_OK
 		# )
 
+class HandlePrivateGroupSessions(AuthenticatedView):
+	def get(self, request, format=None):
+		'''
+		Return the private group session between the logged in user and the user designated
+		by the query parameter messages_with
+
+		messages_with (required) -- The username of the person with whom you want the private conversation
+		'''
+		try:
+			username = request.QUERY_PARAMS['messages_with']
+			messages_with = Profile.objects.get(user__username=username)
+			profile = request.user.get_profile()
+			session = GroupSession.objects.filter(session_creator=profile, session_receiver=messages_with, is_private=True).filter(session_creator=messages_with, session_receiver=profile, is_private=True).order_by('-modified')
+			print "Found Private GS: {}".format(session.title)
+			serializer = GroupSessionSerializer(session)
+			return Response(serializer.data, status=status.HTTP_200_OK)
+		except GroupSession.DoesNotExist:
+			return Response(
+				{'error': 'Private Session does not exist'},
+				status=status.HTTP_404_NOT_FOUND
+			)
+		except GroupSession.MultipleObjectsReturned:
+			return Response(
+				{'error': 'Found more than one private session between the users. This should not happen'},
+				status=status.HTTP_404_NOT_FOUND
+			)
+		except KeyError:
+			return Response(
+				{'error': 'Request was expecting a key value of messages_with'},
+				status=status.HTTP_400_BAD_REQUEST
+			)
+
+
 class HandleCompletedGroupSessions(AuthenticatedView):
 	def get(self, request, format=None):
 		# user_crowds = request.user.get_profile().crowd_set.all()
 		sessions = GroupSession.objects.filter(is_complete=True).order_by('-modified')
-		
+
 
 		paginator = Paginator(sessions, 8)
 		page = request.QUERY_PARAMS.get('page')
@@ -166,7 +190,7 @@ class HandleCompletedGroupSessions(AuthenticatedView):
 
 		serializer_context = {'request': request}
 		serializer = PaginatedCompletedGroupSessionSerializer(sessions, context=serializer_context)
-		return Response(serializer.data, status=status.HTTP_200_OK)		
+		return Response(serializer.data, status=status.HTTP_200_OK)
 
 class HandleGroupSession(AuthenticatedView):
 
@@ -191,41 +215,42 @@ class HandleGroupSessionClips(AuthenticatedView):
 		Add a clip to a session.
 
 		clip (required) -- The clip file to add to the session
-		thumbnail (required)  -- A jpg image file to serve as a thumbnail for the clip
+		waveform (required)  -- A jpg image file to serve as a waveform for the clip
 		'''
 		try:
 			sesh = GroupSession.objects.get(pk=session)
 			user = request.user
 			profile = user.get_profile()
-			if sesh.is_battle:
-				sesh.toggle_waiting_on(user.username)
+			# if sesh.is_battle:
+			# 	sesh.toggle_waiting_on(user.username)
 			f =  request.FILES['clip']
-			thumbnail = None
+			waveform = None
 			c = Clip(
 				clip_num = sesh.num_clips()+1,
 				session = sesh,
 				creator = profile
 			)
 			c.clip = f
-			if 'thumbnail' in request.FILES:
-				thumbnail = request.FILES['thumbnail']
-				c.thumbnail = thumbnail
+			if 'waveform' in request.FILES:
+				waveform = request.FILES['waveform']
+				c.waveform = waveform
 			print 'Clip Created'
 			c.save()
 			print 'Clip Saved'
 
-			# IF BATTLE WE HAVE A 3 ROUND BRAWL
-			if (sesh.is_battle and sesh.num_clips() >= 6):
-				print 'Setting battle {} as complete'
-				sesh.is_complete = True
-				sesh.save()
-			# MAKE SESSION COMPLETE
-			elif not sesh.is_battle and sesh.num_clips() >= 4:
-				print 'Setting session {} as complete'
-				sesh.is_complete = True
-				sesh.save()
+			# # IF BATTLE WE HAVE A 3 ROUND BRAWL
+			# if (sesh.is_battle and sesh.num_clips() >= 6):
+			# 	print 'Setting battle {} as complete'
+			# 	sesh.is_complete = True
+			# 	sesh.save()
+			# # MAKE SESSION COMPLETE
+			# elif not sesh.is_battle and sesh.num_clips() >= 4:
+			# 	print 'Setting session {} as complete'
+			# 	sesh.is_complete = True
+			# 	sesh.save()
+
 			serializer = ClipSerializer(c)
-			
+
 			# Call the method to stitch the video if number of clips >= 4
 			# if sesh.num_clips >= 4:
 			# 	clips = sesh.clip_set.order_by('-created')
@@ -383,7 +408,7 @@ class HandleGroupSessionLikes(AuthenticatedView):
 			'likes': serializer.data
 			},
 			status = status.HTTP_200_OK
-		)	
+		)
 
 class HandleUserLikes(AuthenticatedView):
 	'''
@@ -409,13 +434,13 @@ class HandleBattleVotes(AuthenticatedView):
 			if not sesh.is_battle:
 				return Response({
 					'error': 'Error. This session is not a battle and you can only vote for a battle session.'
-					}, 
+					},
 					status = status.HTTP_400_BAD_REQUEST
 				)
 			elif not sesh.is_complete:
 				return Response({
 					'error': 'Error. You can only vote on completed battles.'
-					}, 
+					},
 					status = status.HTTP_400_BAD_REQUEST
 				)
 
@@ -433,7 +458,7 @@ class HandleBattleVotes(AuthenticatedView):
 					},
 					status = status.HTTP_400_BAD_REQUEST
 				)
-				
+
 			# If we have a valid sesh and vote_for profile then create the vote
 			vote = BattleVote.objects.create(
 				battle = sesh,
@@ -464,8 +489,8 @@ class HandleBattleVotes(AuthenticatedView):
 			)
 
 
-####################################################################### 
-#						BATTLE SESSIONS 
+#######################################################################
+#						BATTLE SESSIONS
 #######################################################################
 
 # class HandleBattleSessions(AuthenticatedView):
@@ -686,7 +711,7 @@ class HandleBattleVotes(AuthenticatedView):
 # 				status=status.HTTP_400_NOT_FOUND
 # 			)
 
-			
+
 # class HandleBattleSessionLikes(AuthenticatedView):
 # 	def post(self, request, format=None):
 # 		'''

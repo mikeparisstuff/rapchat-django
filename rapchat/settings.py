@@ -87,7 +87,7 @@ else:
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 AWS_ACCESS_KEY_ID = 'AKIAJ2KVSZDJH7UPGAAQ'
 AWS_SECRET_ACCESS_KEY = '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'
-AWS_STORAGE_BUCKET_NAME = 'rapback'
+AWS_STORAGE_BUCKET_NAME = 'rapbackppe'
 
 
 
@@ -182,7 +182,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.join(PROJECT_ROOT, 'templates')
+    os.path.join(PROJECT_ROOT, 'templates'),
 )
 
 REST_FRAMEWORK = {
@@ -199,7 +199,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
     ),
-    'PAGINATE_BY': 1, 
+    'PAGINATE_BY': 1,
 }
 
 AUTH_PROFILE_MODULE = 'users.Profile'
@@ -234,7 +234,7 @@ INSTALLED_APPS = (
 
 SWAGGER_SETTINGS = {
     "exclude_namespaces": [],
-    "api_version": '0.1',
+    "api_version": '0.2',
     "api_key": '',
     "enabled_methods": [
         'get',

@@ -31,7 +31,7 @@ class GroupSession(models.Model):
 		default = None
 	)
 
-	# Populated only if it is a battle
+	# Populated only if it is a private chat
 	session_receiver = models.ForeignKey(
 		Profile,
 		related_name='battle_receiver_set',
@@ -40,16 +40,22 @@ class GroupSession(models.Model):
 		default = None
 	)
 
-	is_battle = models.BooleanField(
+	is_private = models.BooleanField(
 		default = False
 	)
 
-	waiting_on_username = models.CharField(
-		max_length = 50,
-		default = None,
-		blank = True,
-		null = True
-	)
+	# Battles are not included in the first version
+	# is_battle = models.BooleanField(
+	# 	default = False
+	# )
+
+	# Battles are phased out for the time being so ignore
+	# waiting_on_username = models.CharField(
+	# 	max_length = 50,
+	# 	default = None,
+	# 	blank = True,
+	# 	null = True
+	# )
 
 	# video_url = models.URLField(
 	# 	default = '',
@@ -63,22 +69,23 @@ class GroupSession(models.Model):
 		null = True
 	)
 
+	# Look for performance hike after adding index here: db_index=True
 	modified = models.DateTimeField(
 		auto_now = True,
 		blank = True,
 		null = True
 	)
 
-
-	def toggle_waiting_on(self, last_added_clip_username):
-		if last_added_clip_username == self.session_creator.user.username:
-			self.waiting_on_username = self.session_receiver.user.username
-		elif self.waiting_on_username == self.session_receiver.user.username:
-			self.waiting_on_username = self.session_creator.user.username
-		else:
-			# This should never occur but if it does leave the field unchanged
-			pass
-		self.save()
+	# Waiting till battles
+	# def toggle_waiting_on(self, last_added_clip_username):
+	# 	if last_added_clip_username == self.session_creator.user.username:
+	# 		self.waiting_on_username = self.session_receiver.user.username
+	# 	elif self.waiting_on_username == self.session_receiver.user.username:
+	# 		self.waiting_on_username = self.session_creator.user.username
+	# 	else:
+	# 		# This should never occur but if it does leave the field unchanged
+	# 		pass
+	# 	self.save()
 
 	def get_round(self):
 		# Could be costly.. Maybe keep running tally
@@ -102,21 +109,22 @@ class GroupSession(models.Model):
 		except Clip.DoesNotExist:
 			return None
 
-	def get_vote_count(self):
-		'''
-		Return a tuple containing the number of votes for the creator and receiver or None if this isn't a battle.
-		(votes_for_creator, votes_for_receiver)
-		'''
-		if self.is_battle:
-			def update_vote(acc, vote):
-				if vote.is_for_creator:
-					return (acc[0]+1, acc[1])
-				else:
-					return (acc[0], acc[1]+1)
-			votes = self.battlevote_set.all()
-			return reduce( update_vote, votes, (0,0))
-		else:
-			return (None, None)
+	# Phased out until battles
+	# def get_vote_count(self):
+	# 	'''
+	# 	Return a tuple containing the number of votes for the creator and receiver or None if this isn't a battle.
+	# 	(votes_for_creator, votes_for_receiver)
+	# 	'''
+	# 	if self.is_battle:
+	# 		def update_vote(acc, vote):
+	# 			if vote.is_for_creator:
+	# 				return (acc[0]+1, acc[1])
+	# 			else:
+	# 				return (acc[0], acc[1]+1)
+	# 		votes = self.battlevote_set.all()
+	# 		return reduce( update_vote, votes, (0,0))
+	# 	else:
+	# 		return (None, None)
 
 
 	def __unicode__(self):
@@ -142,12 +150,12 @@ class Clip(models.Model):
 	session = models.ForeignKey(
 		GroupSession
 	)
-	
+
 	def get_clip_upload_path(self, filename):
 		return 'sessions/session_{}/clip_{}.mp4'.format(self.session.id, self.clip_num)
 
-	def get_thumbnail_upload_path(self, filename):
-		return 'sessions/session_{}/thumbnail_{}.jpg'.format(self.session.id, self.clip_num)
+	def get_waveform_upload_path(self, filename):
+		return 'sessions/session_{}/waveform_{}.jpg'.format(self.session.id, self.clip_num)
 
 	def get_url(self, clip):
 		return clip.clip.url
@@ -156,8 +164,8 @@ class Clip(models.Model):
 		upload_to=get_clip_upload_path
 	)
 
-	thumbnail = models.FileField(
-		upload_to=get_thumbnail_upload_path,
+	waveform = models.FileField(
+		upload_to=get_waveform_upload_path,
 		null = True,
 		blank = True
 	)
@@ -281,7 +289,7 @@ class BattleVote(models.Model):
 	)
 
 	def __unicode__(self):
-		return 'Vote: {}'.format(self.battle.title)	
+		return 'Vote: {}'.format(self.battle.title)
 
 ############################# BATTLES ##################################
 
@@ -362,7 +370,7 @@ class BattleVote(models.Model):
 # 	battle = models.ForeignKey(
 # 		BattleSession
 # 	)
-	
+
 # 	def get_clip_upload_path(self, filename):
 # 		return 'battles/battle_{}/clip_{}.mp4'.format(self.battle.id, self.clip_num)
 

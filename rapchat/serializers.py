@@ -31,15 +31,15 @@ class UserSerializer(serializers.ModelSerializer):
 		)
 
 class UserSerializerWithProfilePicture(serializers.ModelSerializer):
-	
+
 	def get_profile_picture(self, user):
 		if user:
 			profile = user.get_profile()
-			if profile.profile_picture:	
+			if profile.profile_picture:
 				return profile.profile_picture.url if profile.profile_picture.url else None
 		return None
 	profile_picture = serializers.SerializerMethodField('get_profile_picture')
-	
+
 	class Meta:
 		model = User
 		read_only_fields = (
@@ -96,7 +96,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 	user = UserSerializer()
 	# Give nested information for friends
 	friends = ProfileSerializerNoFriends(many=True)
-	
+
 	def get_profile_picture_url(self, profile):
 		if profile.profile_picture:
 			return profile.profile_picture.url if profile.profile_picture.url else None
@@ -174,7 +174,7 @@ class MyProfileSerializer(serializers.ModelSerializer):
 # 		)
 
 # class CrowdSerializerNoMembers(serializers.ModelSerializer):
-	
+
 # 	class Meta:
 # 		model = Crowd
 # 		fields = (
@@ -226,12 +226,12 @@ class GroupSessionSerializer(serializers.ModelSerializer):
 			return None
 		return None
 
-	def get_most_recent_thumbnail_url(self, group_session):
+	def get_most_recent_waveform_url(self, group_session):
 		if group_session:
 			clip = group_session.most_recent_clip()
 			if clip:
 				try:
-					return clip.thumbnail.url
+					return clip.waveform.url
 				except ValueError:
 					return None
 			return None
@@ -243,7 +243,7 @@ class GroupSessionSerializer(serializers.ModelSerializer):
 	comments = serializers.SerializerMethodField('get_comments')
 	likes = serializers.SerializerMethodField('get_likes')
 	clip_url = serializers.SerializerMethodField('get_most_recent_clip_url')
-	thumbnail_url = serializers.SerializerMethodField('get_most_recent_thumbnail_url')
+	waveform_url = serializers.SerializerMethodField('get_most_recent_waveform_url')
 
 	class Meta:
 		model = GroupSession
@@ -254,12 +254,12 @@ class GroupSessionSerializer(serializers.ModelSerializer):
 			'session_receiver',
 			'is_complete',
 			'comments',
-			'is_battle',
+			# 'is_battle',
 			'likes',
 			'clip_url',
-			'thumbnail_url',
+			'waveform_url',
 			'created',
-			'modified'	
+			'modified'
 		)
 
 class GroupSessionSerializerUnkownStatus(serializers.ModelSerializer):
@@ -282,12 +282,12 @@ class GroupSessionSerializerUnkownStatus(serializers.ModelSerializer):
 			return None
 		return None
 
-	def get_most_recent_thumbnail_url(self, group_session):
+	def get_most_recent_waveform_url(self, group_session):
 		if group_session:
 			clip = group_session.most_recent_clip()
 			if clip:
 				try:
-					return clip.thumbnail.url
+					return clip.waveform.url
 				except ValueError:
 					return None
 			return None
@@ -302,7 +302,7 @@ class GroupSessionSerializerUnkownStatus(serializers.ModelSerializer):
 	# crowd = CrowdSerializer()
 	comments = serializers.SerializerMethodField('get_comments')
 	clip_url = serializers.SerializerMethodField('get_most_recent_clip_url')
-	thumbnail_url = serializers.SerializerMethodField('get_most_recent_thumbnail_url')
+	waveform_url = serializers.SerializerMethodField('get_most_recent_waveform_url')
 	likes = serializers.SerializerMethodField('get_likes')
 	clips = serializers.SerializerMethodField('get_clips')
 
@@ -316,8 +316,8 @@ class GroupSessionSerializerUnkownStatus(serializers.ModelSerializer):
 			'likes',
 			'clips',
 			'created',
-			'modified'	
-		)	
+			'modified'
+		)
 
 class CompletedGroupSessionSerializer(serializers.ModelSerializer):
 
@@ -372,7 +372,7 @@ class CompletedGroupSessionSerializer(serializers.ModelSerializer):
 			'likes',
 			'clips',
 			'created',
-			'modified'	
+			'modified'
 		)
 
 
@@ -392,20 +392,20 @@ class ClipSerializer(serializers.ModelSerializer):
 	def get_url(self, clip):
 		return clip.clip.url
 
-	def get_thumbnail_url(self, clip):
-		if clip.thumbnail:
-			return clip.thumbnail.url if clip.thumbnail.url else None
+	def get_waveform_url(self, clip):
+		if clip.waveform:
+			return clip.waveform.url if clip.waveform.url else None
 		return None
 
 	url = serializers.SerializerMethodField('get_url')
-	thumbnail_url = serializers.SerializerMethodField('get_thumbnail_url')
+	waveform_url = serializers.SerializerMethodField('get_waveform_url')
 
 	class Meta:
 		model = Clip
 		fields = (
 			'id',
 			'clip',
-			'thumbnail_url',
+			'waveform_url',
 			'url',
 			'clip_num',
 			'creator',
