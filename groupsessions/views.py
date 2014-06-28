@@ -110,11 +110,11 @@ class HandleGroupSessions(AuthenticatedView):
 		TODO: Filter the user data that gets send at this endpoint.
 		We probably don't want each users friend information to be being sent etc.
 		'''
-		sessions = GroupSession.objects.filter(is_private=False).order_by('-modified')[:36]
+		sessions = GroupSession.objects.filter(is_private=False).order_by('-modified')[:16]
 
 		uname = request.user.username
 
-		paginator = Paginator(sessions, 8)
+		paginator = Paginator(sessions, 4)
 		page = request.QUERY_PARAMS.get('page')
 
 		try:

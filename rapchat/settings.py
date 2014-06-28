@@ -31,6 +31,12 @@ MANAGERS = ADMINS
 import dj_database_url
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
+# S3 SETTINGS
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+AWS_ACCESS_KEY_ID = 'AKIAJ2KVSZDJH7UPGAAQ'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_STORAGE_BUCKET_NAME = 'rapback'
+
 if INSTANCE_ID == 'LOCAL_VAGRANT':
     # DATABASES = {
     #     'default': {
@@ -69,25 +75,31 @@ elif INSTANCE_ID == 'Prod' :
 	  'PORT': '',
 	}
     }
+elif INSTANCE_ID == 'PPE':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+            'NAME': 'RapbackPPE',                      # Or path to database file if using sqlite3.
+            # The following settings are not used with sqlite3:
+            'USER': 'rapback_admin',
+            'PASSWORD': "kB1fo6TCb|8vQt!FAz)nj]~mly6'I",
+            'HOST': 'rapbackppe.cdgnmiiuczg0.us-west-2.rds.amazonaws.com',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+            'PORT': '5432',                      # Set to empty string for default.
+        }
+    }
+    AWS_STORAGE_BUCKET_NAME = 'rapbackppe'
 else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
             'NAME': 'NAME',                      # Or path to database file if using sqlite3.
             # The following settings are not used with sqlite3:
-            'USER': 'USERNAME',
-            'PASSWORD': 'PASSWORD',
-            'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-            'PORT': '',                      # Set to empty string for default.
+            'USER': 'USER',
+            'PASSWORD': "PASSWORD",
+            'HOST': 'HOST',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+            'PORT': '5432',                      # Set to empty string for default.
         }
     }
-
-
-# S3 SETTINGS
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
-AWS_ACCESS_KEY_ID = 'AKIAJ2KVSZDJH7UPGAAQ'
-AWS_SECRET_ACCESS_KEY = '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'
-AWS_STORAGE_BUCKET_NAME = 'rapbackppe'
 
 
 
@@ -169,6 +181,7 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'rapchat.middleware.ProfileMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )

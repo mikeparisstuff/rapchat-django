@@ -6,7 +6,7 @@ from rest_framework import routers
 from users import views as users_views
 # from crowds import views as crowds_views
 from groupsessions import views as sessions_views
-from feedback import views as feedback_views 
+from feedback import views as feedback_views
 
 admin.autodiscover()
 
@@ -29,7 +29,7 @@ urlpatterns = patterns('',
     url(r'^users/me/votes/$', users_views.HandleVotes.as_view(), name='handle_my_votes'),
     url(r'^users/obtain-token/$', 'rest_framework.authtoken.views.obtain_auth_token'),
     url(r'^invite/$', users_views.HandleInvites.as_view(), name='invite_users'),
-    
+
     url(r'^search/$', users_views.HandleSearch.as_view(), name='search_users'),
 
     url(r'^users/me/friends/$', users_views.HandleFriends.as_view(), name='handle_friends'),

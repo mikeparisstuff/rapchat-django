@@ -73,7 +73,8 @@ class GroupSession(models.Model):
 	modified = models.DateTimeField(
 		auto_now = True,
 		blank = True,
-		null = True
+		null = True,
+		db_index = True
 	)
 
 	# Waiting till battles
