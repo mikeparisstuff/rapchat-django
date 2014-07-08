@@ -23,7 +23,7 @@ class GroupSession(models.Model):
 		default=False
 	)
 
-	session_creator = models.ForeignKey(
+	creator = models.ForeignKey(
 		Profile,
 		related_name='session_creator_set',
 		blank = True,
@@ -32,7 +32,7 @@ class GroupSession(models.Model):
 	)
 
 	# Populated only if it is a private chat
-	session_receiver = models.ForeignKey(
+	receiver = models.ForeignKey(
 		Profile,
 		related_name='battle_receiver_set',
 		blank = True,
@@ -63,14 +63,14 @@ class GroupSession(models.Model):
 	# 	null = True
 	# )
 
-	created = models.DateTimeField(
+	created_at = models.DateTimeField(
 		auto_now_add = True,
 		blank = True,
 		null = True
 	)
 
 	# Look for performance hike after adding index here: db_index=True
-	modified = models.DateTimeField(
+	modified_at = models.DateTimeField(
 		auto_now = True,
 		blank = True,
 		null = True,
@@ -132,6 +132,44 @@ class GroupSession(models.Model):
 		return 'Session: {}'.format(self.title)
 
 
+class Beat(models.Model):
+	'''
+	Rapback beat model
+	'''
+
+	# The title of the beat
+	title = models.CharField(
+		max_length = 64
+	)
+
+	# The author of the beat
+	author = models.CharField(
+		max_length = 64
+	)
+
+	# The file of the song in the phone directory
+	filename = models.CharField(
+		max_length = 64
+	)
+
+	# The duration of the song in milliseconds
+	duration = models.IntegerField(
+		default = 0
+	)
+
+	created_at = models.DateTimeField(
+		auto_now_add = True,
+		blank = True,
+		null = True
+	)
+
+	modified_at = models.DateTimeField(
+		auto_now = True,
+		blank = True,
+		null = True
+	)
+
+
 
 class Clip(models.Model):
 	'''
@@ -152,6 +190,25 @@ class Clip(models.Model):
 		GroupSession
 	)
 
+	# The time in the beat that this clip begins measured in milliseconds
+	start_time = models.IntegerField(
+		default = 0
+	)
+
+	# The time in this beat the the clip ends measured in milliseconds
+	end_time = models.IntegerField(
+		default = 0
+	)
+
+	# The number of times that this clip has been played
+	times_played = models.IntegerField(
+		default = 0
+	)
+
+	beat = models.ForeignKey(
+		Beat
+	)
+
 	def get_clip_upload_path(self, filename):
 		return 'sessions/session_{}/clip_{}.mp4'.format(self.session.id, self.clip_num)
 
@@ -165,20 +222,20 @@ class Clip(models.Model):
 		upload_to=get_clip_upload_path
 	)
 
-	waveform = models.FileField(
+	waveform_image = models.FileField(
 		upload_to=get_waveform_upload_path,
 		null = True,
 		blank = True
 	)
 
-	created = models.DateTimeField(
+	created_at = models.DateTimeField(
 		auto_now_add = True,
 		blank = True,
 		null = True
 	)
 
-	modified = models.DateTimeField(
-		auto_now_add = True,
+	modified_at = models.DateTimeField(
+		auto_now = True,
 		blank = True,
 		null = True
 	)
@@ -188,6 +245,7 @@ def update_session_modified_timestamp(sender, instance=None, created=False, **kw
 	if created and instance:
 		print 'Updating modified timestamp on session: {}'.format(instance.session.pk)
 		instance.session.save()
+
 
 
 class Comment(models.Model):
@@ -213,13 +271,13 @@ class Comment(models.Model):
 		blank = False
 	)
 
-	created = models.DateTimeField(
+	created_at = models.DateTimeField(
 		auto_now_add = True,
 		blank=True,
 		null=True
 	)
 
-	modified = models.DateTimeField(
+	modified_at = models.DateTimeField(
 		auto_now = True,
 		blank = True,
 		null = True
@@ -239,13 +297,13 @@ class Like(models.Model):
 		GroupSession
 	)
 
-	created = models.DateTimeField(
+	created_at = models.DateTimeField(
 		auto_now_add = True,
 		blank=True,
 		null=True
 	)
 
-	modified = models.DateTimeField(
+	modified_at = models.DateTimeField(
 		auto_now = True,
 		blank = True,
 		null = True
@@ -254,43 +312,43 @@ class Like(models.Model):
 	def __unicode__(self):
 		return 'Like: {}'.format(self.session.title)
 
-class BattleVote(models.Model):
-	'''
-	Register votes for battles
-	'''
-	voter = models.ForeignKey(
-		Profile,
-		related_name = "voter_set"
-	)
+# class BattleVote(models.Model):
+# 	'''
+# 	Register votes for battles
+# 	'''
+# 	voter = models.ForeignKey(
+# 		Profile,
+# 		related_name = "voter_set"
+# 	)
 
-	voted_for = models.ForeignKey(
-		Profile,
-		related_name = "voted_for_set"
-	)
+# 	voted_for = models.ForeignKey(
+# 		Profile,
+# 		related_name = "voted_for_set"
+# 	)
 
-	battle = models.ForeignKey(
-		GroupSession
-	)
+# 	battle = models.ForeignKey(
+# 		GroupSession
+# 	)
 
-	# A helper field to speed up tallying votes
-	is_for_creator = models.BooleanField(
-		default = True
-	)
+# 	# A helper field to speed up tallying votes
+# 	is_for_creator = models.BooleanField(
+# 		default = True
+# 	)
 
-	created = models.DateTimeField(
-		auto_now_add = True,
-		blank=True,
-		null=True
-	)
+# 	created_at = models.DateTimeField(
+# 		auto_now_add = True,
+# 		blank=True,
+# 		null=True
+# 	)
 
-	modified = models.DateTimeField(
-		auto_now = True,
-		blank = True,
-		null = True
-	)
+# 	modified_at = models.DateTimeField(
+# 		auto_now = True,
+# 		blank = True,
+# 		null = True
+# 	)
 
-	def __unicode__(self):
-		return 'Vote: {}'.format(self.battle.title)
+# 	def __unicode__(self):
+# 		return 'Vote: {}'.format(self.battle.title)
 
 ############################# BATTLES ##################################
 

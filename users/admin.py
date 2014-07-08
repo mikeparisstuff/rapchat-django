@@ -36,7 +36,7 @@ class FriendRequestAdmin(admin.ModelAdmin):
 		'sender',
 		'requested',
 		'is_accepted',
-		'created'
+		'created_at'
 	)
 
 admin.site.register(FriendRequest, FriendRequestAdmin)

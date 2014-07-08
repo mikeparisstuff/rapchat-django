@@ -36,6 +36,12 @@ class Profile(AbstractUser):
 		max_length = 15
 	)
 
+	modified_at = models.DateTimeField(
+		auto_now = True,
+		blank = True,
+		null = True
+	)
+
 	# objects = UserManager()
 
 
@@ -126,12 +132,12 @@ class FriendRequest(models.Model):
 	is_accepted = models.BooleanField(
 		default= False
 	)
-	created = models.DateTimeField(
+	created_at = models.DateTimeField(
 		auto_now_add = True,
 		null=True,
 		blank=True
 	)
-	modified = models.DateTimeField(
+	modified_at = models.DateTimeField(
 		auto_now = True,
 		null=True,
 		blank=True

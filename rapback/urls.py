@@ -25,7 +25,7 @@ urlpatterns = patterns('',
     url(r'^users/me/$', users_views.HandleMyProfile.as_view(), name='get_my_user'),
     url(r'^users/me/likes/$', sessions_views.HandleGroupSessionLikes.as_view(), name='get_my_likes'),
     url(r'^users/me/clips/$', sessions_views.HandleMyGroupSessionClips.as_view(), name='get_my_clips'),
-    url(r'^users/me/votes/$', users_views.HandleVotes.as_view(), name='handle_my_votes'),
+    # url(r'^users/me/votes/$', users_views.HandleVotes.as_view(), name='handle_my_votes'),
     url(r'^users/obtain-token/$', 'rest_framework.authtoken.views.obtain_auth_token'),
     url(r'^invite/$', users_views.HandleInvites.as_view(), name='invite_users'),
 
@@ -45,7 +45,7 @@ urlpatterns = patterns('',
     url(r'^sessions/(?P<session>\d+)/$', sessions_views.HandleGroupSession.as_view(), name='handle_single_session'),
     url(r'^sessions/(?P<session>\d+)/clips/$', sessions_views.HandleGroupSessionClips.as_view(), name='handle_clips'),
     url(r'^sessions/(?P<session>\d+)/comments/$', sessions_views.HandleGroupSessionComments.as_view(), name='handle_session_comments'),
-    url(r'^sessions/(?P<session>\d+)/votes/$', sessions_views.HandleBattleVotes.as_view(), name='handle_battle_votes'),
+    # url(r'^sessions/(?P<session>\d+)/votes/$', sessions_views.HandleBattleVotes.as_view(), name='handle_battle_votes'),
     # url(r'^sessions/likes/$', sessions_views.HandleSessionLikes.as_view(), name='handle_likes'),
 
     # BATTLES ENDPOINTS

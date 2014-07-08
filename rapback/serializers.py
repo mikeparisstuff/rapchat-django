@@ -1,7 +1,7 @@
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework import serializers, pagination
 
-from groupsessions.models import GroupSession, Clip, Comment, Like, BattleVote
+from groupsessions.models import GroupSession, Clip, Comment, Like
 # , BattleSession, BattleClip, BattleComment, BattleLike
 from users.models import Profile, FriendRequest
 # from crowds.models import Crowd
@@ -119,8 +119,8 @@ class FriendRequestSerializer(serializers.ModelSerializer):
 			'sender',
 			'requested',
 			'is_accepted',
-			'created',
-			'modified'
+			'created_at',
+			'modified_at'
 		)
 
 
@@ -185,8 +185,8 @@ class MyProfileSerializer(serializers.ModelSerializer):
 # 			'id',
 # 			'title',
 # 			'members',
-# 			'created',
-# 			'modified'
+# 			'created_at',
+# 			'modified_at'
 # 		)
 
 # class CrowdSerializerNoMembers(serializers.ModelSerializer):
@@ -196,8 +196,8 @@ class MyProfileSerializer(serializers.ModelSerializer):
 # 		fields = (
 # 			'id',
 # 			'title',
-# 			'created',
-# 			'modified'
+# 			'created_at',
+# 			'modified_at'
 # 		)
 
 ###########################################################
@@ -215,8 +215,8 @@ class CommentSerializer(serializers.ModelSerializer):
 			'commenter',
 			'session',
 			'text',
-			'created',
-			'modified'
+			'created_at',
+			'modified_at'
 		)
 
 
@@ -247,7 +247,7 @@ class GroupSessionSerializer(serializers.ModelSerializer):
 			clip = group_session.most_recent_clip()
 			if clip:
 				try:
-					return clip.waveform.url
+					return clip.waveform_image.url
 				except ValueError:
 					return None
 			return None
@@ -274,8 +274,8 @@ class GroupSessionSerializer(serializers.ModelSerializer):
 			'likes',
 			'clip_url',
 			'waveform_url',
-			'created',
-			'modified'
+			'created_at',
+			'modified_at'
 		)
 
 class GroupSessionSerializerUnkownStatus(serializers.ModelSerializer):
@@ -303,7 +303,7 @@ class GroupSessionSerializerUnkownStatus(serializers.ModelSerializer):
 			clip = group_session.most_recent_clip()
 			if clip:
 				try:
-					return clip.waveform.url
+					return clip.waveform_image.url
 				except ValueError:
 					return None
 			return None
@@ -331,8 +331,8 @@ class GroupSessionSerializerUnkownStatus(serializers.ModelSerializer):
 			'comments',
 			'likes',
 			'clips',
-			'created',
-			'modified'
+			'created_at',
+			'modified_at'
 		)
 
 class CompletedGroupSessionSerializer(serializers.ModelSerializer):
@@ -367,8 +367,8 @@ class CompletedGroupSessionSerializer(serializers.ModelSerializer):
 			return { 'votes_for_creator': votes[0], 'votes_for_receiver': votes[1] }
 		return None
 
-	session_creator = ProfileSerializerNoFriends()
-	session_receiver = ProfileSerializerNoFriends()
+	creator = ProfileSerializerNoFriends()
+	receiver = ProfileSerializerNoFriends()
 	comments = serializers.SerializerMethodField('get_comments')
 	likes = serializers.SerializerMethodField('get_likes')
 	clips = serializers.SerializerMethodField('get_clips')
@@ -381,14 +381,14 @@ class CompletedGroupSessionSerializer(serializers.ModelSerializer):
 			'title',
 			'is_complete',
 			'is_battle',
-			'session_creator',
-			'session_receiver',
+			'creator',
+			'receiver',
 			'votes',
 			'comments',
 			'likes',
 			'clips',
-			'created',
-			'modified'
+			'created_at',
+			'modified_at'
 		)
 
 
@@ -410,7 +410,7 @@ class ClipSerializer(serializers.ModelSerializer):
 
 	def get_waveform_url(self, clip):
 		if clip.waveform:
-			return clip.waveform.url if clip.waveform.url else None
+			return clip.waveform_image.url if clip.waveform_image.url else None
 		return None
 
 	url = serializers.SerializerMethodField('get_url')
@@ -426,8 +426,8 @@ class ClipSerializer(serializers.ModelSerializer):
 			'clip_num',
 			'creator',
 			'session',
-			'created',
-			'modified'
+			'created_at',
+			'modified_at'
 		)
 
 class LikeSerializer(serializers.ModelSerializer):
@@ -442,8 +442,8 @@ class LikeSerializer(serializers.ModelSerializer):
 			'id',
 			'username',
 			'session',
-			'created',
-			'modified'
+			'created_at',
+			'modified_at'
 		)
 
 ######################################################################
@@ -484,22 +484,22 @@ class PublicProfileSerializer(serializers.ModelSerializer):
 #   Vote Serializers
 #######################################################################
 
-class VoteSerializer(serializers.ModelSerializer):
+# class VoteSerializer(serializers.ModelSerializer):
 
-	voter = ProfileSerializerNoFriends()
-	voted_for = ProfileSerializerNoFriends()
-	battle = GroupSessionSerializer()
+# 	voter = ProfileSerializerNoFriends()
+# 	voted_for = ProfileSerializerNoFriends()
+# 	battle = GroupSessionSerializer()
 
-	class Meta:
-		model = BattleVote
-		fields = (
-			'id',
-			'voter',
-			'voted_for',
-			'battle',
-			'created',
-			'modified'
-		)
+# 	class Meta:
+# 		model = BattleVote
+# 		fields = (
+# 			'id',
+# 			'voter',
+# 			'voted_for',
+# 			'battle',
+# 			'created_at',
+# 			'modified_at'
+# 		)
 
 
 
@@ -517,8 +517,8 @@ class VoteSerializer(serializers.ModelSerializer):
 # 			'commenter',
 # 			'battle',
 # 			'text',
-# 			'created',
-# 			'modified'
+# 			'created_at',
+# 			'modified_at'
 # 		)
 
 # class BattleSessionSerializer(serializers.ModelSerializer):
@@ -568,8 +568,8 @@ class VoteSerializer(serializers.ModelSerializer):
 # 			'is_complete',
 # 			'clip_url',
 # 			'thumbnail_url',
-# 			'created',
-# 			'modified'
+# 			'created_at',
+# 			'modified_at'
 # 		)
 
 # class CompletedBattleSessionSerializer(serializers.ModelSerializer):
@@ -590,8 +590,8 @@ class VoteSerializer(serializers.ModelSerializer):
 # 			'is_complete',
 # 			'likes',
 # 			'clips',
-# 			'created',
-# 			'modified'
+# 			'created_at',
+# 			'modified_at'
 # 		)
 
 
@@ -632,8 +632,8 @@ class VoteSerializer(serializers.ModelSerializer):
 # 			'battle',
 # 			'clip_num',
 # 			'creator',
-# 			'created',
-# 			'modified'
+# 			'created_at',
+# 			'modified_at'
 # 		)
 
 # class BattleLikeSerializer(serializers.ModelSerializer):
@@ -646,6 +646,6 @@ class VoteSerializer(serializers.ModelSerializer):
 # 			'id',
 # 			'username',
 # 			'battle',
-# 			'created',
-# 			'modified'
+# 			'created_at',
+# 			'modified_at'
 # 		)

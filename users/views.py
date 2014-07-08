@@ -8,7 +8,7 @@ from rest_framework.authtoken.models import Token
 
 
 from users.models import Profile, FriendRequest
-from rapback.serializers import ProfileSerializer, ProfileSerializer, FriendRequestSerializer, ProfileSerializerNoFriends, MyProfileSerializer, PublicProfileSerializer, LikeSerializer, VoteSerializer
+from rapback.serializers import ProfileSerializer, ProfileSerializer, FriendRequestSerializer, ProfileSerializerNoFriends, MyProfileSerializer, PublicProfileSerializer, LikeSerializer
 # , LikeSerializerNoMembers
 from core.api import AuthenticatedView, UnauthenticatedView
 
@@ -320,25 +320,25 @@ class HandleFriends(AuthenticatedView):
 			status=status.HTTP_200_OK
 		)
 
-class HandleVotes(AuthenticatedView):
+# class HandleVotes(AuthenticatedView):
 
-	def get(self, request, format=None):
-		'''
-		Get a list of the ids of all completed battle sessions that I have previously voted on.
-		Note. We return ids because all we need to do is know which sessions we have already voted on in the client.
-		return {
-			'votes' : [...]
-		}
-		'''
-		profile = request.user.get_profile()
-		votes = profile.voter_set.all()
-		def id_from_vote(acc, vote):
-			acc.add(vote.battle.id)
-			return acc
+# 	def get(self, request, format=None):
+# 		'''
+# 		Get a list of the ids of all completed battle sessions that I have previously voted on.
+# 		Note. We return ids because all we need to do is know which sessions we have already voted on in the client.
+# 		return {
+# 			'votes' : [...]
+# 		}
+# 		'''
+# 		profile = request.user.get_profile()
+# 		votes = profile.voter_set.all()
+# 		def id_from_vote(acc, vote):
+# 			acc.add(vote.battle.id)
+# 			return acc
 
-		vote_ids = reduce( id_from_vote, votes, set())
-		# v_serializer = VoteSerializer(votes, many=True)
-		return Response({
-			'votes': vote_ids
-			}, status = status.HTTP_200_OK
-		)
+# 		vote_ids = reduce( id_from_vote, votes, set())
+# 		# v_serializer = VoteSerializer(votes, many=True)
+# 		return Response({
+# 			'votes': vote_ids
+# 			}, status = status.HTTP_200_OK
+# 		)

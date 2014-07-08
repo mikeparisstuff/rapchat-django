@@ -4,9 +4,9 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from groupsessions.models import GroupSession, Clip, Comment, Like, BattleVote
+from groupsessions.models import GroupSession, Clip, Comment, Like
 # , BattleSession, BattleClip, BattleLike, BattleComment
-from rapback.serializers import GroupSessionSerializer, ClipSerializer, CommentSerializer, LikeSerializer, PaginatedGroupSessionSerializer, PaginatedCompletedGroupSessionSerializer, VoteSerializer
+from rapback.serializers import GroupSessionSerializer, ClipSerializer, CommentSerializer, LikeSerializer, PaginatedGroupSessionSerializer, PaginatedCompletedGroupSessionSerializer
 # from rapback.serializers import PaginatedBattleSessionSerializer, BattleSessionSerializer
 from users.models import Profile
 from core.api import AuthenticatedView
@@ -412,76 +412,76 @@ class HandleGroupSessionLikes(AuthenticatedView):
 			status = status.HTTP_200_OK
 		)
 
-class HandleBattleVotes(AuthenticatedView):
+# class HandleBattleVotes(AuthenticatedView):
 
-	def post(self, request, format=None, session=None):
-		'''
-		Add a vote to a battle session.
+# 	def post(self, request, format=None, session=None):
+# 		'''
+# 		Add a vote to a battle session.
 
-		session (required) -- This is supplied as a session_id in the url
-		voted_for (required) -- The username of the person being voted for
-		'''
-		try:
-			# Get the session
-			sesh = GroupSession.objects.get(pk=session)
+# 		session (required) -- This is supplied as a session_id in the url
+# 		voted_for (required) -- The username of the person being voted for
+# 		'''
+# 		try:
+# 			# Get the session
+# 			sesh = GroupSession.objects.get(pk=session)
 
-			# If the session is not a battle then stop
-			if not sesh.is_battle:
-				return Response({
-					'error': 'Error. This session is not a battle and you can only vote for a battle session.'
-					},
-					status = status.HTTP_400_BAD_REQUEST
-				)
-			elif not sesh.is_complete:
-				return Response({
-					'error': 'Error. You can only vote on completed battles.'
-					},
-					status = status.HTTP_400_BAD_REQUEST
-				)
+# 			# If the session is not a battle then stop
+# 			if not sesh.is_battle:
+# 				return Response({
+# 					'error': 'Error. This session is not a battle and you can only vote for a battle session.'
+# 					},
+# 					status = status.HTTP_400_BAD_REQUEST
+# 				)
+# 			elif not sesh.is_complete:
+# 				return Response({
+# 					'error': 'Error. You can only vote on completed battles.'
+# 					},
+# 					status = status.HTTP_400_BAD_REQUEST
+# 				)
 
-			# Get person being voted for
-			vote_for_username = request.DATA['voted_for']
-			if sesh.session_creator.user.username == vote_for_username:
-				vote_for = sesh.session_creator
-				is_for_creator = True
-			elif sesh.session_receiver.user.username == vote_for_username:
-				vote_for = sesh.session_receiver
-				is_for_creator = False
-			else:
-				return Response({
-					'error': 'Error. Cannot vote for a user that is not involved in this battle'
-					},
-					status = status.HTTP_400_BAD_REQUEST
-				)
+# 			# Get person being voted for
+# 			vote_for_username = request.DATA['voted_for']
+# 			if sesh.session_creator.user.username == vote_for_username:
+# 				vote_for = sesh.session_creator
+# 				is_for_creator = True
+# 			elif sesh.session_receiver.user.username == vote_for_username:
+# 				vote_for = sesh.session_receiver
+# 				is_for_creator = False
+# 			else:
+# 				return Response({
+# 					'error': 'Error. Cannot vote for a user that is not involved in this battle'
+# 					},
+# 					status = status.HTTP_400_BAD_REQUEST
+# 				)
 
-			# If we have a valid sesh and vote_for profile then create the vote
-			vote = BattleVote.objects.create(
-				battle = sesh,
-				voter = request.user.get_profile(),
-				voted_for = vote_for,
-				is_for_creator = is_for_creator
-			)
+# 			# If we have a valid sesh and vote_for profile then create the vote
+# 			vote = BattleVote.objects.create(
+# 				battle = sesh,
+# 				voter = request.user.get_profile(),
+# 				voted_for = vote_for,
+# 				is_for_creator = is_for_creator
+# 			)
 
-			# vote_serializer = VoteSerializer(vote)
-			votes = sesh.get_vote_count();
-			return Response({
-				'votes': {'votes_for_creator': votes[0], 'votes_for_receiver': votes[1]} ,
-				'detail': 'Successfully voted for {} in session {}'.format(vote_for.user.username, sesh.title)
-				},
-				status=status.HTTP_201_CREATED
-			)
-		except KeyError as ke:
-			return Response({
-				'error': 'Error creating vote: {} is a required field'.format(ke)
-				},
-				status=status.HTTP_400_BAD_REQUEST
-			)
-		except GroupSession.DoesNotExist:
-			return Response({
-				'error': 'Error creating vote. Could not find GroupSession with id: {}'.format(session)
-				},
-				status = status.HTTP_400_BAD_REQUEST
-			)
+# 			# vote_serializer = VoteSerializer(vote)
+# 			votes = sesh.get_vote_count();
+# 			return Response({
+# 				'votes': {'votes_for_creator': votes[0], 'votes_for_receiver': votes[1]} ,
+# 				'detail': 'Successfully voted for {} in session {}'.format(vote_for.user.username, sesh.title)
+# 				},
+# 				status=status.HTTP_201_CREATED
+# 			)
+# 		except KeyError as ke:
+# 			return Response({
+# 				'error': 'Error creating vote: {} is a required field'.format(ke)
+# 				},
+# 				status=status.HTTP_400_BAD_REQUEST
+# 			)
+# 		except GroupSession.DoesNotExist:
+# 			return Response({
+# 				'error': 'Error creating vote. Could not find GroupSession with id: {}'.format(session)
+# 				},
+# 				status = status.HTTP_400_BAD_REQUEST
+# 			)
 
 
 #######################################################################

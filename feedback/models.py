@@ -19,13 +19,13 @@ class FeedbackMessage(models.Model):
 		default = False
 	)
 
-	created = models.DateTimeField(
+	created_at = models.DateTimeField(
 		auto_now_add = True,
 		blank = True,
 		null = True
 	)
 
-	modified = models.DateTimeField(
+	modified_at = models.DateTimeField(
 		auto_now = True,
 		blank = True,
 		null = True
