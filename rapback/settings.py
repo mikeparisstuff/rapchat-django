@@ -53,16 +53,6 @@ if INSTANCE_ID == 'LOCAL_VAGRANT':
     #         'PORT': '',                      # Set to empty string for default.
     #     }
     # }
-    DATABASES = {
-        'default' : {
-            'ENGINE' : 'django.db.backends.postgresql_psycopg2',
-            'NAME' : 'd20vr0sil2d4oe',
-            'USER' : 'ryatbdsdjdnvzu',
-            'HOST' : 'ec2-54-235-152-22.compute-1.amazonaws.com',
-            'PORT' : '5432',
-            'PASSWORD' : 'i5RJ664vXlOZ2KOj8lBSUFWz-s'
-        }
-    }
 elif INSTANCE_ID == 'HEROKU':
     DATABASES = {
         'default': dj_database_url.config()
@@ -82,12 +72,12 @@ elif INSTANCE_ID == 'PPE':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-            'NAME': 'RapbackPPE',                      # Or path to database file if using sqlite3.
+            'NAME': os.environ['RDS_DB_NAME'],                      # Or path to database file if using sqlite3.
             # The following settings are not used with sqlite3:
-            'USER': 'rapback_admin',
-            'PASSWORD': "kB1fo6TCb|8vQt!FAz)nj]~mly6'I",
-            'HOST': 'rapbackppe.cdgnmiiuczg0.us-west-2.rds.amazonaws.com',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-            'PORT': '5432',                      # Set to empty string for default.
+            'USER': os.environ['RDS_USERNAME'],
+            'PASSWORD': os.environ['RDS_PASSWORD'],
+            'HOST': os.environ['RDS_HOSTNAME'],                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+            'PORT': os.environ['RDS_PORT'],                      # Set to empty string for default.
         }
     }
     AWS_STORAGE_BUCKET_NAME = 'rapbackppe'
