@@ -32,7 +32,7 @@ class HandleGroupSessions(AuthenticatedView):
 		'''
 		try:
 			title = request.DATA['title']
-			prof = request.user.get_profile()
+			prof = request.user
 			print "REQUEST DATA: {}".format(request.DATA)
 
 			# Check to see if is_battle is in the request
@@ -54,18 +54,17 @@ class HandleGroupSessions(AuthenticatedView):
 			if is_private:
 				print "is_private is true"
 				br_uname = request.DATA['private_receiver']
-				br_prof = Profile.objects.get(user__username=br_uname)
+				br_prof = Profile.objects.get(username=br_uname)
 				gs = GroupSession.objects.create(
 					title = title,
-					session_creator = prof,
-					session_receiver = br_prof,
-					waiting_on_username = br_uname,
+					creator = prof,
+					receiver = br_prof,
 					is_private = True
 				)
 			else:
 				gs = GroupSession.objects.create(
 					title = title,
-					session_creator = prof,
+					creator = prof,
 					is_private = False
 				)
 
@@ -75,7 +74,7 @@ class HandleGroupSessions(AuthenticatedView):
 			c = Clip(
 				clip_num = gs.num_clips()+1,
 				session = gs,
-				creator = request.user.get_profile()
+				creator = request.user
 			)
 			if 'waveform' in request.FILES:
 				waveform = request.FILES['waveform']
@@ -149,9 +148,9 @@ class HandlePrivateGroupSessions(AuthenticatedView):
 		'''
 		try:
 			username = request.QUERY_PARAMS['messages_with']
-			messages_with = Profile.objects.get(user__username=username)
-			profile = request.user.get_profile()
-			session = GroupSession.objects.filter(session_creator=profile, session_receiver=messages_with, is_private=True).filter(session_creator=messages_with, session_receiver=profile, is_private=True).order_by('-modified')
+			messages_with = Profile.objects.get(username=username)
+			profile = request.user
+			session = GroupSession.objects.filter(creator=profile, receiver=messages_with, is_private=True).filter(creator=messages_with, receiver=profile, is_private=True).order_by('-modified')
 			print "Found Private GS: {}".format(session.title)
 			serializer = GroupSessionSerializer(session)
 			return Response(serializer.data, status=status.HTTP_200_OK)
@@ -174,7 +173,7 @@ class HandlePrivateGroupSessions(AuthenticatedView):
 
 class HandleCompletedGroupSessions(AuthenticatedView):
 	def get(self, request, format=None):
-		# user_crowds = request.user.get_profile().crowd_set.all()
+		# user_crowds = request.user.crowd_set.all()
 		sessions = GroupSession.objects.filter(is_complete=True).order_by('-modified')
 
 
@@ -222,7 +221,7 @@ class HandleGroupSessionClips(AuthenticatedView):
 		try:
 			sesh = GroupSession.objects.get(pk=session)
 			user = request.user
-			profile = user.get_profile()
+			profile = user
 			# if sesh.is_battle:
 			# 	sesh.toggle_waiting_on(user.username)
 			f =  request.FILES['clip']
@@ -310,7 +309,7 @@ class HandleGroupSessionComments(AuthenticatedView):
 			sesh = GroupSession.objects.get(pk=session)
 			comment = Comment.objects.create(
 				session=sesh,
-				creator=request.user.get_profile(),
+				creator=request.user,
 				text = request.DATA['text']
 			)
 			serializer = CommentSerializer(comment)
@@ -370,7 +369,7 @@ class HandleGroupSessionLikes(AuthenticatedView):
 		try:
 			session = GroupSession.objects.get(id=request.DATA['session'])
 			like = Like.objects.get(
-				user = request.user.get_profile(),
+				user = request.user,
 				session= session
 			)
 			like.delete()
@@ -380,7 +379,7 @@ class HandleGroupSessionLikes(AuthenticatedView):
 			)
 		except Like.DoesNotExist:
 			like = Like.objects.create(
-				user= request.user.get_profile(),
+				user= request.user,
 				session= session
 			)
 			serializer = LikeSerializer(like)
@@ -441,10 +440,10 @@ class HandleGroupSessionLikes(AuthenticatedView):
 
 # 			# Get person being voted for
 # 			vote_for_username = request.DATA['voted_for']
-# 			if sesh.session_creator.user.username == vote_for_username:
+# 			if sesh.creator.user.username == vote_for_username:
 # 				vote_for = sesh.session_creator
 # 				is_for_creator = True
-# 			elif sesh.session_receiver.user.username == vote_for_username:
+# 			elif sesh.receiver.user.username == vote_for_username:
 # 				vote_for = sesh.session_receiver
 # 				is_for_creator = False
 # 			else:
@@ -457,7 +456,7 @@ class HandleGroupSessionLikes(AuthenticatedView):
 # 			# If we have a valid sesh and vote_for profile then create the vote
 # 			vote = BattleVote.objects.create(
 # 				battle = sesh,
-# 				voter = request.user.get_profile(),
+# 				voter = request.user,
 # 				voted_for = vote_for,
 # 				is_for_creator = is_for_creator
 # 			)
@@ -505,7 +504,7 @@ class HandleGroupSessionLikes(AuthenticatedView):
 # 			title = request.DATA['title']
 # 			prof = request.user.get_profile()
 # 			recv_uname = request.DATA['battle_receiver']
-# 			receiver = Profile.objects.get(user__username=recv_uname)
+# 			receiver = Profile.objects.get(username=recv_uname)
 # 			battle = BattleSession.objects.create(
 # 				title = title,
 # 				battle_receiver = receiver,

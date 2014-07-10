@@ -41,18 +41,18 @@ AWS_SECRET_ACCESS_KEY = '+5v1k20p+1XJkNj2GOfIcLeNy0Ya8A/e81B9oKbd'
 AWS_STORAGE_BUCKET_NAME = 'rapback'
 
 if INSTANCE_ID == 'LOCAL_VAGRANT':
-    # DATABASES = {
-    #     'default': {
-    #         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-    #         'NAME': 'rapback_dev',                      # Or path to database file if using sqlite3.
-    #         # The following settings are not used with sqlite3:
-    #         'TEST_NAME': 'rapchat_test',
-    #         'USER': 'django_login',
-    #         'PASSWORD': 'django_login',
-    #         'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-    #         'PORT': '',                      # Set to empty string for default.
-    #     }
-    # }
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+            'NAME': 'rapback_dev',                      # Or path to database file if using sqlite3.
+            # The following settings are not used with sqlite3:
+            'TEST_NAME': 'rapchat_test',
+            'USER': 'django_login',
+            'PASSWORD': 'django_login',
+            'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+            'PORT': '',                      # Set to empty string for default.
+        }
+    }
 elif INSTANCE_ID == 'HEROKU':
     DATABASES = {
         'default': dj_database_url.config()
