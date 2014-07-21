@@ -38,13 +38,12 @@ else:
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 AWS_ACCESS_KEY_ID = os.environ['AWS_KEY']
 AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET']
-AWS_STORAGE_BUCKET_NAME = 'rapbackppe-s3bucket'
 
 if INSTANCE_ID == 'LOCAL_VAGRANT':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-            'NAME': 'rapback_dev',                      # Or path to database file if using sqlite3.
+            'NAME': 'rapback_vagrant',                      # Or path to database file if using sqlite3.
             # The following settings are not used with sqlite3:
             'TEST_NAME': 'rapchat_test',
             'USER': 'django_login',
@@ -53,6 +52,7 @@ if INSTANCE_ID == 'LOCAL_VAGRANT':
             'PORT': '',                      # Set to empty string for default.
         }
     }
+    AWS_STORAGE_BUCKET_NAME = 'rapback-vagrantbucket'
 elif INSTANCE_ID == 'HEROKU':
     DATABASES = {
         'default': dj_database_url.config()
@@ -80,7 +80,7 @@ elif INSTANCE_ID == 'PPE':
             'PORT': os.environ['RDS_PORT'],                      # Set to empty string for default.
         }
     }
-    AWS_STORAGE_BUCKET_NAME = 'rapbackppe'
+    AWS_STORAGE_BUCKET_NAME = 'rapbackppe-s3bucket'
 else:
     DATABASES = {
         'default': {

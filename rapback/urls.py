@@ -41,7 +41,7 @@ urlpatterns = patterns('',
     # SESSIONS ENDPOINTS
     url(r'^users/me/sessions/$', sessions_views.HandleGroupSessions.as_view(), name='handle_sessions'),
     url(r'^users/me/sessions/live/$', sessions_views.HandleGroupSessions.as_view(), name='handle_sessions'),
-    url(r'^users/me/sessions/complete/$', sessions_views.HandleCompletedGroupSessions.as_view(), name='handle_completed_sessions'),
+    # url(r'^users/me/sessions/complete/$', sessions_views.HandleCompletedGroupSessions.as_view(), name='handle_completed_sessions'),
     url(r'^sessions/(?P<session>\d+)/$', sessions_views.HandleGroupSession.as_view(), name='handle_single_session'),
     url(r'^sessions/(?P<session>\d+)/clips/$', sessions_views.HandleGroupSessionClips.as_view(), name='handle_clips'),
     url(r'^sessions/(?P<session>\d+)/comments/$', sessions_views.HandleGroupSessionComments.as_view(), name='handle_session_comments'),

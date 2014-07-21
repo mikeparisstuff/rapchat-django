@@ -2,12 +2,9 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
-from groupsessions.models import GroupSession, Clip, Comment, Like
-# , BattleSession, BattleClip, BattleLike, BattleComment
+from groupsessions.models import GroupSession, Clip, Comment, Like, Beat
 from rapback.serializers import GroupSessionSerializer, ClipSerializer, CommentSerializer, LikeSerializer, PaginatedGroupSessionSerializer, PaginatedCompletedGroupSessionSerializer
-# from rapback.serializers import PaginatedBattleSessionSerializer, BattleSessionSerializer
 from users.models import Profile
 from core.api import AuthenticatedView
 # from core.video_stitching import video_stitcher
@@ -21,395 +18,457 @@ import json
 
 class HandleGroupSessions(AuthenticatedView):
 
-	def post(self, request, format=None):
-		'''
-		Create a GroupSession
+    def post(self, request, format=None):
+        '''
+        Create a GroupSession
 
-		title (required) -- The title for the rap session
-		is_private (required) -- Boolean indicating whether or not this is a new battle
-		private_receiver (optional) -- If is_battle this is required. Gives username of person being battled
-		clip (required) -- File. A file holding the clip to be added to the new session
-		'''
-		try:
-			title = request.DATA['title']
-			prof = request.user
-			print "REQUEST DATA: {}".format(request.DATA)
+        title (required) -- The title for the rap session
+        clip (required) -- The rap clip for the rap session
+        duration (required) -- The duration of the song in milliseconds
+        waveform (required) -- The image for the waveform of the first clip
+        visibility (required) -- A value of either 'public' or 'friends' the designate who can see this session
+        beat_id (required) -- The id of the beat associated with this rap
+        '''
+        try:
+            print(request.DATA)
+            print(request.FILES)
+            title = request.DATA['title']
+            clip = request.FILES['clip']
+            duration = request.DATA['duration']
+            visibility = request.DATA['visibility']
+            creator = request.user
 
-			# Check to see if is_battle is in the request
-			if 'is_private' in request.DATA:
-				is_private = request.DATA['is_private']
-			else:
-				is_private = False
+            beat = Beat.objects.get(id = request.DATA['beat_id'])
+            print "tick"
+            gs = GroupSession.objects.create(
+                title = title,
+                creator = creator,
+                visibility = visibility,
+                beat = beat
+            )
+            print "created session"
+            # Create Clip
+            rap = request.FILES['clip']
+            clip = Clip(
+                clip_num = 1,
+                clip = clip,
+                creator = creator,
+                session = gs,
+                start_time = 0,
+                end_time = duration
+            )
+            if 'waveform' in request.FILES:
+                waveform = request.FILES['waveform']
+                clip.waveform_image = waveform
 
-			if not isinstance(is_private, bool):
-				if isinstance(is_private, unicode):
-					print
-					is_private = False if is_private == u'0' else True
-				elif isinstance(is_private, str):
-					is_private = False if is_private.lower() == 'false' else True
-				else:
-					is_private = False
-				# The param is a string not a boolean
-				print "is_private not a bool and is {}".format(is_private)
-			if is_private:
-				print "is_private is true"
-				br_uname = request.DATA['private_receiver']
-				br_prof = Profile.objects.get(username=br_uname)
-				gs = GroupSession.objects.create(
-					title = title,
-					creator = prof,
-					receiver = br_prof,
-					is_private = True
-				)
-			else:
-				gs = GroupSession.objects.create(
-					title = title,
-					creator = prof,
-					is_private = False
-				)
+            clip.save()
+            print "created clip"
+            serializer = GroupSessionSerializer(gs)
+            return Response(
+                {"session": serializer.data},
+                status=status.HTTP_201_CREATED
+            )
+        except KeyError:
+            return Response(
+                {'error': 'New sessions require a title, clip, duration, beat_id, waveform, and visibility'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
-			#Create Clip
-			f =  request.FILES['clip']
-			waveform = None
-			c = Clip(
-				clip_num = gs.num_clips()+1,
-				session = gs,
-				creator = request.user
-			)
-			if 'waveform' in request.FILES:
-				waveform = request.FILES['waveform']
-				c.waveform = waveform
-			c.clip = f
-			print 'Clip Created'
-			c.save()
-			print 'Clip Saved'
+    # def post(self, request, format=None):
+    # 	'''
+    # 	Create a GroupSession
+    #
+    # 	title (required) -- The title for the rap session
+    # 	is_private (required) -- Boolean indicating whether or not this is a new battle
+    # 	private_receiver (optional) -- If is_battle this is required. Gives username of person being battled
+    # 	clip (required) -- File. A file holding the clip to be added to the new session
+    # 	'''
+    # 	try:
+    # 		title = request.DATA['title']
+    # 		prof = request.user
+    # 		print "REQUEST DATA: {}".format(request.DATA)
+    #
+    # 		# Check to see if is_battle is in the request
+    # 		if 'is_private' in request.DATA:
+    # 			# is_private = request.DATA['is_private']
+    # 		else:
+    # 			is_private = False
+    #
+    # 		if not isinstance(is_private, bool):
+    # 			if isinstance(is_private, unicode):
+    # 				print
+    # 				is_private = False if is_private == u'0' else True
+    # 			elif isinstance(is_private, str):
+    # 				is_private = False if is_private.lower() == 'false' else True
+    # 			else:
+    # 				is_private = False
+    # 			# The param is a string not a boolean
+    # 			print "is_private not a bool and is {}".format(is_private)
+    # 		if is_private:
+    # 			print "is_private is true"
+    # 			br_uname = request.DATA['private_receiver']
+    # 			br_prof = Profile.objects.get(username=br_uname)
+    # 			gs = GroupSession.objects.create(
+    # 				title = title,
+    # 				creator = prof,
+    # 				receiver = br_prof,
+    # 				is_private = True
+    # 			)
+    # 		else:
+    # 			gs = GroupSession.objects.create(
+    # 				title = title,
+    # 				creator = prof,
+    # 				is_private = False
+    # 			)
+    #
+    # 		#Create Clip
+    # 		f =  request.FILES['clip']
+    # 		waveform = None
+    # 		c = Clip(
+    # 			clip_num = gs.num_clips()+1,
+    # 			session = gs,
+    # 			creator = request.user
+    # 		)
+    # 		if 'waveform' in request.FILES:
+    # 			waveform = request.FILES['waveform']
+    # 			c.waveform = waveform
+    # 		c.clip = f
+    # 		print 'Clip Created'
+    # 		c.save()
+    # 		print 'Clip Saved'
+    #
+    # 		serializer = GroupSessionSerializer(gs)
+    #
+    # 		return Response(
+    # 			{'session': serializer.data},
+    # 			status=status.HTTP_201_CREATED
+    # 		)
+    #
+    # 	except KeyError:
+    # 		return Response(
+    # 			{'error': 'New sessions require a title'},
+    # 			status=status.HTTP_400_BAD_REQUEST
+    # 		)
+    # 	# except Crowd.DoesNotExist:
+    # 	# 	return Response(
+    # 	# 		{'error': 'Could not find crowd with id {}'.format(request.DATA['crowd'])},
+    # 	# 		status=status.HTTP_404_NOT_FOUND
+    # 	# 	)
 
-			serializer = GroupSessionSerializer(gs)
+    def get(self, request, format=None):
+        '''
+        Return a list of sessions for the currently logged in user.
 
-			return Response(
-				{'session': serializer.data},
-				status=status.HTTP_201_CREATED
-			)
+        TODO: Filter the user data that gets send at this endpoint.
+        We probably don't want each users friend information to be being sent etc.
+        '''
+        sessions = GroupSession.objects.order_by('-modified_at')[:16]
 
-		except KeyError:
-			return Response(
-				{'error': 'New sessions require a title'},
-				status=status.HTTP_400_BAD_REQUEST
-			)
-		# except Crowd.DoesNotExist:
-		# 	return Response(
-		# 		{'error': 'Could not find crowd with id {}'.format(request.DATA['crowd'])},
-		# 		status=status.HTTP_404_NOT_FOUND
-		# 	)
+        uname = request.user.username
 
-	def get(self, request, format=None):
-		'''
-		Return a list of sessions for the currently logged in user.
+        print "USER: {0}".format(request.user.username)
 
-		TODO: Filter the user data that gets send at this endpoint.
-		We probably don't want each users friend information to be being sent etc.
-		'''
-		sessions = GroupSession.objects.filter(is_private=False).order_by('-modified')[:16]
+        paginator = Paginator(sessions, 4)
+        page = request.QUERY_PARAMS.get('page')
 
-		uname = request.user.username
-
-		print "USER: {0}".format(request.user.username)
-
-		paginator = Paginator(sessions, 4)
-		page = request.QUERY_PARAMS.get('page')
-
-		try:
-			sessions = paginator.page(page)
-		except PageNotAnInteger:
-			# If page is not an integer, deliver first page
-			sessions = paginator.page(1)
-		except EmptyPage:
-			# if page is out of range, return last page
-			sessions = paginator.page(paginator.num_pages)
-
-
-		serializer_context = {'request': request}
-		serializer = PaginatedGroupSessionSerializer(sessions, context=serializer_context)
-		return Response(serializer.data, status=status.HTTP_200_OK)
-
-		# serializer = GroupSessionSerializer(sessions, many=True)
-		# return Response(
-		# 	{'sessions': serializer.data},
-		# 	status=status.HTTP_200_OK
-		# )
-
-class HandlePrivateGroupSessions(AuthenticatedView):
-	def get(self, request, format=None):
-		'''
-		Return the private group session between the logged in user and the user designated
-		by the query parameter messages_with
-
-		messages_with (required) -- The username of the person with whom you want the private conversation
-		'''
-		try:
-			username = request.QUERY_PARAMS['messages_with']
-			messages_with = Profile.objects.get(username=username)
-			profile = request.user
-			session = GroupSession.objects.filter(creator=profile, receiver=messages_with, is_private=True).filter(creator=messages_with, receiver=profile, is_private=True).order_by('-modified')
-			print "Found Private GS: {}".format(session.title)
-			serializer = GroupSessionSerializer(session)
-			return Response(serializer.data, status=status.HTTP_200_OK)
-		except GroupSession.DoesNotExist:
-			return Response(
-				{'error': 'Private Session does not exist'},
-				status=status.HTTP_404_NOT_FOUND
-			)
-		except GroupSession.MultipleObjectsReturned:
-			return Response(
-				{'error': 'Found more than one private session between the users. This should not happen'},
-				status=status.HTTP_404_NOT_FOUND
-			)
-		except KeyError:
-			return Response(
-				{'error': 'Request was expecting a key value of messages_with'},
-				status=status.HTTP_400_BAD_REQUEST
-			)
+        try:
+            sessions = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page
+            sessions = paginator.page(1)
+        except EmptyPage:
+            # if page is out of range, return last page
+            sessions = paginator.page(paginator.num_pages)
 
 
-class HandleCompletedGroupSessions(AuthenticatedView):
-	def get(self, request, format=None):
-		# user_crowds = request.user.crowd_set.all()
-		sessions = GroupSession.objects.filter(is_complete=True).order_by('-modified')
+        serializer_context = {'request': request}
+        serializer = PaginatedGroupSessionSerializer(sessions, context=serializer_context)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
+        # serializer = GroupSessionSerializer(sessions, many=True)
+        # return Response(
+        # 	{'sessions': serializer.data},
+        # 	status=status.HTTP_200_OK
+        # )
 
-		paginator = Paginator(sessions, 8)
-		page = request.QUERY_PARAMS.get('page')
+# class HandlePrivateSessions(AuthenticatedView):
+#     def post(self, request, format=None):
+#         '''
+#         Create a new private group session
+#         '''
+#
+#     def get(self, request, format=None):
+#         '''
+#         Return the private group session between the logged in user and the user designated
+#         by the query parameter messages_with
+#
+#         messages_with (required) -- The username of the person with whom you want the private conversation
+#         '''
+#         try:
+#             username = request.QUERY_PARAMS['messages_with']
+#             messages_with = Profile.objects.get(username=username)
+#             profile = request.user
+#             session = GroupSession.objects.filter(creator=profile, receiver=messages_with, is_private=True).filter(creator=messages_with, receiver=profile, is_private=True).order_by('-modified')
+#             print "Found Private GS: {}".format(session.title)
+#             serializer = GroupSessionSerializer(session)
+#             return Response(serializer.data, status=status.HTTP_200_OK)
+#         except GroupSession.DoesNotExist:
+#             return Response(
+#                 {'error': 'Private Session does not exist'},
+#                 status=status.HTTP_404_NOT_FOUND
+#             )
+#         except GroupSession.MultipleObjectsReturned:
+#             return Response(
+#                 {'error': 'Found more than one private session between the users. This should not happen'},
+#                 status=status.HTTP_404_NOT_FOUND
+#             )
+#         except KeyError:
+#             return Response(
+#                 {'error': 'Request was expecting a key value of messages_with'},
+#                 status=status.HTTP_400_BAD_REQUEST
+#             )
+#
+#
+# class HandleCompletedGroupSessions(AuthenticatedView):
+#     def get(self, request, format=None):
+#         # user_crowds = request.user.crowd_set.all()
+#         sessions = GroupSession.objects.filter(is_complete=True).order_by('-modified')
+#
+#
+#         paginator = Paginator(sessions, 8)
+#         page = request.QUERY_PARAMS.get('page')
+#
+#         try:
+#             sessions = paginator.page(page)
+#         except PageNotAnInteger:
+#             # If page is not an integer, deliver first page
+#             sessions = paginator.page(1)
+#         except EmptyPage:
+#             # if page is out of range, return last page
+#             sessions = paginator.page(paginator.num_pages)
+#
+#         serializer_context = {'request': request}
+#         serializer = PaginatedCompletedGroupSessionSerializer(sessions, context=serializer_context)
+#         return Response(serializer.data, status=status.HTTP_200_OK)
 
-		try:
-			sessions = paginator.page(page)
-		except PageNotAnInteger:
-			# If page is not an integer, deliver first page
-			sessions = paginator.page(1)
-		except EmptyPage:
-			# if page is out of range, return last page
-			sessions = paginator.page(paginator.num_pages)
-
-		serializer_context = {'request': request}
-		serializer = PaginatedCompletedGroupSessionSerializer(sessions, context=serializer_context)
-		return Response(serializer.data, status=status.HTTP_200_OK)
 
 class HandleGroupSession(AuthenticatedView):
 
-	def get(self, request, format=None, session=None):
-		'''
-		Return a single session as designated by the id in the URL
-		'''
-		try:
-			sesh = GroupSession.objects.get(pk=session)
-			serializer = GroupSessionSerializer(sesh)
-			return Response(serializer.data, status=status.HTTP_200_OK)
-		except GroupSession.DoesNotExist:
-			return Response({
-				'error': 'Could not find a session with that id.'
-				}, status=status.HTTP_400_BAD_REQUEST
-			)
+    def get(self, request, format=None, session=None):
+        '''
+        Return a single session as designated by the id in the URL
+        '''
+        try:
+            sesh = GroupSession.objects.get(pk=session)
+            serializer = GroupSessionSerializer(sesh)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except GroupSession.DoesNotExist:
+            return Response({
+                'error': 'Could not find a session with that id.'
+                }, status=status.HTTP_400_BAD_REQUEST
+            )
 
 class HandleGroupSessionClips(AuthenticatedView):
 
-	def post(self, request, format=None, session=None):
-		'''
-		Add a clip to a session.
+    def post(self, request, format=None, session=None):
+        '''
+        Add a clip to a session.
 
-		clip (required) -- The clip file to add to the session
-		waveform (required)  -- A jpg image file to serve as a waveform for the clip
-		'''
-		try:
-			sesh = GroupSession.objects.get(pk=session)
-			user = request.user
-			profile = user
-			# if sesh.is_battle:
-			# 	sesh.toggle_waiting_on(user.username)
-			f =  request.FILES['clip']
-			waveform = None
-			c = Clip(
-				clip_num = sesh.num_clips()+1,
-				session = sesh,
-				creator = profile
-			)
-			c.clip = f
-			if 'waveform' in request.FILES:
-				waveform = request.FILES['waveform']
-				c.waveform = waveform
-			print 'Clip Created'
-			c.save()
-			print 'Clip Saved'
+        clip (required) -- The clip file to add to the session
+        waveform (required)  -- A jpg image file to serve as a waveform for the clip
+        '''
+        try:
+            sesh = GroupSession.objects.get(pk=session)
+            user = request.user
+            profile = user
+            # if sesh.is_battle:
+            # 	sesh.toggle_waiting_on(user.username)
+            f =  request.FILES['clip']
+            waveform = None
+            c = Clip(
+                clip_num = sesh.num_clips()+1,
+                session = sesh,
+                creator = profile
+            )
+            c.clip = f
+            if 'waveform' in request.FILES:
+                waveform = request.FILES['waveform']
+                c.waveform = waveform
+            print 'Clip Created'
+            c.save()
+            print 'Clip Saved'
 
-			# # IF BATTLE WE HAVE A 3 ROUND BRAWL
-			# if (sesh.is_battle and sesh.num_clips() >= 6):
-			# 	print 'Setting battle {} as complete'
-			# 	sesh.is_complete = True
-			# 	sesh.save()
-			# # MAKE SESSION COMPLETE
-			# elif not sesh.is_battle and sesh.num_clips() >= 4:
-			# 	print 'Setting session {} as complete'
-			# 	sesh.is_complete = True
-			# 	sesh.save()
+            # # IF BATTLE WE HAVE A 3 ROUND BRAWL
+            # if (sesh.is_battle and sesh.num_clips() >= 6):
+            # 	print 'Setting battle {} as complete'
+            # 	sesh.is_complete = True
+            # 	sesh.save()
+            # # MAKE SESSION COMPLETE
+            # elif not sesh.is_battle and sesh.num_clips() >= 4:
+            # 	print 'Setting session {} as complete'
+            # 	sesh.is_complete = True
+            # 	sesh.save()
 
-			serializer = ClipSerializer(c)
+            serializer = ClipSerializer(c)
 
-			# Call the method to stitch the video if number of clips >= 4
-			# if sesh.num_clips >= 4:
-			# 	clips = sesh.clip_set.order_by('-created')
-			# 	clip_urls = [clip.get_url() for clip in clips]
-			# 	video_stitcher.stitch_videos(clip_urls)
+            # Call the method to stitch the video if number of clips >= 4
+            # if sesh.num_clips >= 4:
+            # 	clips = sesh.clip_set.order_by('-created')
+            # 	clip_urls = [clip.get_url() for clip in clips]
+            # 	video_stitcher.stitch_videos(clip_urls)
 
-			return Response({
-				'clip':serializer.data
-				},
-				status=status.HTTP_200_OK
-			)
-		except KeyError:
-			return Response(
-				{'error': 'A clip file and session are required to add a clip'},
-				status=status.HTTP_400_BAD_REQUEST
-			)
-		except GroupSession.DoesNotExist:
-			return Response(
-				{'error': 'The session with id {} could not be found'.format(request.DATA['session'])},
-				status = status.HTTP_404_NOT_FOUND
-			)
+            return Response({
+                'clip':serializer.data
+                },
+                status=status.HTTP_200_OK
+            )
+        except KeyError:
+            return Response(
+                {'error': 'A clip file and session are required to add a clip'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        except GroupSession.DoesNotExist:
+            return Response(
+                {'error': 'The session with id {} could not be found'.format(request.DATA['session'])},
+                status = status.HTTP_404_NOT_FOUND
+            )
 
-	def get(self, request, format=None, session=None):
-		'''
-		Return data on each of the clips for the session specified in the url.
-		'''
-		try:
-			clips = Clip.objects.filter(session=session)
-			serializer = ClipSerializer(clips, many=True)
-			return Response({'clips': serializer.data}, status=status.HTTP_200_OK)
-		except Clip.DoesNotExist:
-			return Response({
-				'error': 'Could not find any clips for session {}'.format(session)
-				}, status=status.HTTP_400_BAD_REQUEST
-			)
+    def get(self, request, format=None, session=None):
+        '''
+        Return data on each of the clips for the session specified in the url.
+        '''
+        try:
+            clips = Clip.objects.filter(session=session)
+            serializer = ClipSerializer(clips, many=True)
+            return Response({'clips': serializer.data}, status=status.HTTP_200_OK)
+        except Clip.DoesNotExist:
+            return Response({
+                'error': 'Could not find any clips for session {}'.format(session)
+                }, status=status.HTTP_400_BAD_REQUEST
+            )
 
 class HandleMyGroupSessionClips(AuthenticatedView):
-	def get(self, request, format=None):
-		'''
-		Get all my clips.
-		'''
-		clips = request.user.clip_set.all().order_by('-created')
-		serializer = ClipSerializer(clips, many=True)
-		return Response({'clips': serializer.data}, status=status.HTTP_200_OK)
+    def get(self, request, format=None):
+        '''
+        Get all my clips.
+        '''
+        clips = request.user.clip_set.all().order_by('-created')
+        serializer = ClipSerializer(clips, many=True)
+        return Response({'clips': serializer.data}, status=status.HTTP_200_OK)
 
 
 class HandleGroupSessionComments(AuthenticatedView):
-	def post(self, request, format=None, session=None):
-		'''
-		Add a comment to a session.
+    def post(self, request, format=None, session=None):
+        '''
+        Add a comment to a session.
 
-		text (required) -- The text of the comment itself
-		'''
-		try:
-			sesh = GroupSession.objects.get(pk=session)
-			comment = Comment.objects.create(
-				session=sesh,
-				creator=request.user,
-				text = request.DATA['text']
-			)
-			serializer = CommentSerializer(comment)
-			return Response({
-				'comment': serializer.data,
-				'detail': 'Successfully added comment to session %d' % sesh.id
-				},
-				status=status.HTTP_200_OK
-			)
-		except KeyError:
-			return Response({
-				'error': 'Error creating comment. Comments need a session and comment_text.'
-				},
-				status=status.HTTP_400_BAD_REQUEST
-			)
+        text (required) -- The text of the comment itself
+        '''
+        try:
+            sesh = GroupSession.objects.get(pk=session)
+            comment = Comment.objects.create(
+                session=sesh,
+                creator=request.user,
+                text = request.DATA['text']
+            )
+            serializer = CommentSerializer(comment)
+            return Response({
+                'comment': serializer.data,
+                'detail': 'Successfully added comment to session %d' % sesh.id
+                },
+                status=status.HTTP_200_OK
+            )
+        except KeyError:
+            return Response({
+                'error': 'Error creating comment. Comments need a session and comment_text.'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
-	def get(self, request, format=None, session=None):
-		'''
-		Get all of a sessions comments.
+    def get(self, request, format=None, session=None):
+        '''
+        Get all of a sessions comments.
 
-		session (required) -- The id of the session. This must be included in the url e.g. /sessions/comments/1/
-		would refer to the session with id == 1.
-		'''
-		try:
-			sesh = GroupSession.objects.get(pk=session)
-			comments = sesh.get_comments()
-			# s_serializer = GroupSessionSerializer(sesh)
-			print ' Found comments'
-			c_serializer = CommentSerializer(comments, many=True)
-			print 'Serialized comments'
-			return Response({
-				'comments': c_serializer.data,
-				'detail': 'Successfully found comments for session %d' % sesh.id
-				},
-				status=status.HTTP_200_OK
-			)
-		except KeyError:
-			return Response({
-				'error': 'Need a session to find comments for.'
-				},
-				status=status.HTTP_400_BAD_REQUEST
-			)
-		except GroupSession.DoesNotExist:
-			return Response({
-				'error': 'Sorry, we could not find that session.'
-				},
-				status=status.HTTP_400_BAD_REQUEST
-			)
+        session (required) -- The id of the session. This must be included in the url e.g. /sessions/comments/1/
+        would refer to the session with id == 1.
+        '''
+        try:
+            sesh = GroupSession.objects.get(pk=session)
+            comments = sesh.get_comments()
+            # s_serializer = GroupSessionSerializer(sesh)
+            print ' Found comments'
+            c_serializer = CommentSerializer(comments, many=True)
+            print 'Serialized comments'
+            return Response({
+                'comments': c_serializer.data,
+                'detail': 'Successfully found comments for session %d' % sesh.id
+                },
+                status=status.HTTP_200_OK
+            )
+        except KeyError:
+            return Response({
+                'error': 'Need a session to find comments for.'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        except GroupSession.DoesNotExist:
+            return Response({
+                'error': 'Sorry, we could not find that session.'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 class HandleGroupSessionLikes(AuthenticatedView):
-	def post(self, request, format=None):
-		'''
-		Add a like to a session
+    def post(self, request, format=None):
+        '''
+        Add a like to a session
 
-		session (required) -- The id of the session to add the comment to
-		'''
-		try:
-			session = GroupSession.objects.get(id=request.DATA['session'])
-			like = Like.objects.get(
-				user = request.user,
-				session= session
-			)
-			like.delete()
-			return Response({
-				'like': {'detail': 'Successfully deleted like'}
-				}, status=status.HTTP_200_OK
-			)
-		except Like.DoesNotExist:
-			like = Like.objects.create(
-				user= request.user,
-				session= session
-			)
-			serializer = LikeSerializer(like)
-			return Response({
-				'like': serializer.data
-				},
-				status=status.HTTP_201_CREATED
-			)
-		except KeyError:
-			return Response({
-				'detail': 'Failed to create like'},
-				status = status.HTTP_400_BAD_REQUEST
-				)
+        session (required) -- The id of the session to add the comment to
+        '''
+        try:
+            session = GroupSession.objects.get(id=request.DATA['session'])
+            like = Like.objects.get(
+                user = request.user,
+                session= session
+            )
+            like.delete()
+            return Response({
+                'like': {'detail': 'Successfully deleted like'}
+                }, status=status.HTTP_200_OK
+            )
+        except Like.DoesNotExist:
+            like = Like.objects.create(
+                user= request.user,
+                session= session
+            )
+            serializer = LikeSerializer(like)
+            return Response({
+                'like': serializer.data
+                },
+                status=status.HTTP_201_CREATED
+            )
+        except KeyError:
+            return Response({
+                'detail': 'Failed to create like'},
+                status = status.HTTP_400_BAD_REQUEST
+                )
 
-	def get(self, request, format=None):
-		'''
-		Get all the likes for the currently logged in user
-		'''
-		likes = request.user.get_likes()
-		print likes
-		serializer = None
-		if len(likes) > 1:
-			serializer = LikeSerializer(likes, many=True)
-		else:
-			serializer = LikeSerializer(likes)
-		return Response({
-			'likes': serializer.data
-			},
-			status = status.HTTP_200_OK
-		)
+    def get(self, request, format=None):
+        '''
+        Get all the likes for the currently logged in user
+        '''
+        likes = request.user.get_likes()
+        print likes
+        serializer = None
+        if len(likes) > 1:
+            serializer = LikeSerializer(likes, many=True)
+        else:
+            serializer = LikeSerializer(likes)
+        return Response({
+            'likes': serializer.data
+            },
+            status = status.HTTP_200_OK
+        )
 
 # class HandleBattleVotes(AuthenticatedView):
 

@@ -8,6 +8,9 @@ from django.dispatch import receiver
 
 from rest_framework.authtoken.models import Token
 
+def get_profile_picture_upload_path(self, filename):
+	return 'profiles/profile_{}/profile_picture.jpg'.format(self.username)
+
 class Profile(AbstractUser):
 	'''
 	Registered Rapchat User
@@ -18,9 +21,6 @@ class Profile(AbstractUser):
 	# 	User,
 	# 	null = False
 	# )
-
-	def get_profile_picture_upload_path(self, filename):
-		return 'profiles/profile_{}/profile_picture.jpg'.format(self.user.username)
 
 	profile_picture = models.FileField(
 		upload_to=get_profile_picture_upload_path,

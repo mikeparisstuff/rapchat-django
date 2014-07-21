@@ -1,7 +1,7 @@
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework import serializers, pagination
 
-from groupsessions.models import GroupSession, Clip, Comment, Like
+from groupsessions.models import GroupSession, Clip, Comment, Like, Beat
 # , BattleSession, BattleClip, BattleComment, BattleLike
 from users.models import Profile, FriendRequest
 # from crowds.models import Crowd
@@ -12,164 +12,121 @@ from users.models import Profile, FriendRequest
 #  User, Profile, Friends Serializers
 ########################################################################
 
-# class UserSerializer(serializers.ModelSerializer):
-
-# 	class Meta:
-# 		model = User
-# 		read_only_fields = (
-# 			'id',
-# 		)
-# 		fields = (
-# 			'id',
-# 			'first_name',
-# 			'last_name',
-# 			'email',
-# 			'username',
-# 			'date_joined',
-# 			'last_login'
-# 		)
-
-# class UserSerializerWithProfilePicture(serializers.ModelSerializer):
-# 	def get_profile_picture(self, user):
-# 		if user:
-# 			profile = user.get_profile()
-# 			if profile.profile_picture:
-# 				return profile.profile_picture.url if profile.profile_picture.url else None
-# 		return None
-# 	profile_picture = serializers.SerializerMethodField('get_profile_picture')
-
-# 	class Meta:
-# 		model = User
-# 		read_only_fields = (
-# 			'id',
-# 		)
-# 		fields = (
-# 			'id',
-# 			'first_name',
-# 			'last_name',
-# 			'email',
-# 			'username',
-# 			'profile_picture',
-# 			'date_joined',
-# 			'last_login'
-# 		)
-
 
 class ProfileSerializerNoFriends(serializers.ModelSerializer):
-	# user = UserSerializer()
 
-	def get_profile_picture_url(self, profile):
-		if profile.profile_picture:
-			return profile.profile_picture.url if profile.profile_picture.url else None
-		return None
+    def get_profile_picture_url(self, profile):
+        if profile.profile_picture:
+            return profile.profile_picture.url if profile.profile_picture.url else None
+        return None
 
-	profile_picture = serializers.SerializerMethodField('get_profile_picture_url')
+    profile_picture = serializers.SerializerMethodField('get_profile_picture_url')
 
-	class Meta:
-		model = Profile
-		fields = (
-			'id',
-			'username',
-			'first_name',
-			'last_name',
-			'email',
-			'phone_number',
-			'profile_picture',
-			'date_joined',
-			'last_login'
-		)
+    class Meta:
+        model = Profile
+        fields = (
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'email',
+            'phone_number',
+            'profile_picture',
+            'date_joined',
+            'last_login'
+        )
 
 
 class ProfileSerializer(serializers.ModelSerializer):
 
-	# user = UserSerializer()
-	# Give nested information for friends
-	friends = ProfileSerializerNoFriends(many=True)
+    # user = UserSerializer()
+    # Give nested information for friends
+    friends = ProfileSerializerNoFriends(many=True)
 
-	def get_profile_picture_url(self, profile):
-		if profile.profile_picture:
-			return profile.profile_picture.url if profile.profile_picture.url else None
-		return None
+    def get_profile_picture_url(self, profile):
+        if profile.profile_picture:
+            return profile.profile_picture.url if profile.profile_picture.url else None
+        return None
 
-	profile_picture = serializers.SerializerMethodField('get_profile_picture_url')
+    profile_picture = serializers.SerializerMethodField('get_profile_picture_url')
 
-	class Meta:
-		model = Profile
-		fields = (
-			'id',
-			'username',
-			'first_name',
-			'last_name',
-			'email',
-			'phone_number',
-			'profile_picture',
-			'date_joined',
-			'last_login',
-			'friends'
-		)
+    class Meta:
+        model = Profile
+        fields = (
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'email',
+            'phone_number',
+            'profile_picture',
+            'date_joined',
+            'last_login',
+            'friends'
+        )
 
 class FriendRequestSerializer(serializers.ModelSerializer):
 
-	sender = ProfileSerializerNoFriends()
-	requested = ProfileSerializerNoFriends()
+    sender = ProfileSerializerNoFriends()
+    requested = ProfileSerializerNoFriends()
 
-	class Meta:
-		model=FriendRequest
-		fields = (
-			'sender',
-			'requested',
-			'is_accepted',
-			'created_at',
-			'modified_at'
-		)
+    class Meta:
+        model=FriendRequest
+        fields = (
+            'sender',
+            'requested',
+            'is_accepted',
+            'created_at',
+            'modified_at'
+        )
 
 
 class MyProfileSerializer(serializers.ModelSerializer):
 
-	def get_num_likes(self, profile):
-		if profile:
-			return profile.get_num_likes()
-		return None
+    def get_num_likes(self, profile):
+        if profile:
+            return profile.get_num_likes()
+        return None
 
-	def get_num_raps(self, profile):
-		if profile:
-			return profile.get_num_raps()
+    def get_num_raps(self, profile):
+        if profile:
+            return profile.get_num_raps()
 
-	def get_num_friends(self, profile):
-		if profile:
-			return profile.get_num_friends()
-		return None
+    def get_num_friends(self, profile):
+        if profile:
+            return profile.get_num_friends()
+        return None
 
-	def get_profile_picture_url(self, profile):
-		if profile.profile_picture:
-			return profile.profile_picture.url if profile.profile_picture.url else None
-		return None
+    def get_profile_picture_url(self, profile):
+        if profile.profile_picture:
+            return profile.profile_picture.url if profile.profile_picture.url else None
+        return None
 
-	# user = UserSerializer()
-	friends = ProfileSerializerNoFriends(many=True)
-	num_likes = serializers.SerializerMethodField('get_num_likes')
-	num_friends = serializers.SerializerMethodField('get_num_friends')
-	num_raps = serializers.SerializerMethodField('get_num_raps')
-	profile_picture = serializers.SerializerMethodField('get_profile_picture_url')
+    # user = UserSerializer()
+    friends = ProfileSerializerNoFriends(many=True)
+    num_likes = serializers.SerializerMethodField('get_num_likes')
+    num_friends = serializers.SerializerMethodField('get_num_friends')
+    num_raps = serializers.SerializerMethodField('get_num_raps')
+    profile_picture = serializers.SerializerMethodField('get_profile_picture_url')
 
-	class Meta:
-		model = Profile
-		fields = (
-			'id',
-			'username',
-			'first_name',
-			'last_name',
-			'email',
-			'phone_number',
-			'profile_picture',
-			'date_joined',
-			'last_login',
-			'friends',
-			'phone_number',
-			'num_likes',
-			'num_friends',
-			'num_raps'
-		)
+    class Meta:
+        model = Profile
+        fields = (
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'email',
+            'phone_number',
+            'profile_picture',
+            'date_joined',
+            'last_login',
+            'friends',
+            'phone_number',
+            'num_likes',
+            'num_friends',
+            'num_raps'
+        )
 
 #################################################################
 # Crowd Serializers
@@ -206,245 +163,271 @@ class MyProfileSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
 
-	commenter = serializers.Field(source='creator.username')
+    commenter = serializers.Field(source='creator.username')
 
-	class Meta:
-		model = Comment
-		fields = (
-			'id',
-			'commenter',
-			'session',
-			'text',
-			'created_at',
-			'modified_at'
-		)
+    class Meta:
+        model = Comment
+        fields = (
+            'id',
+            'commenter',
+            'session',
+            'text',
+            'created_at',
+            'modified_at'
+        )
 
+class BeatSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Beat
+        fields = (
+            'id',
+            'title',
+            'author',
+            'filename',
+            'duration',
+            'created_at',
+            'modified_at'
+        )
 
 class GroupSessionSerializer(serializers.ModelSerializer):
 
-	# May be a cleaner way to get this relationship
-	# TODO: investigate
-	def get_comments(self, group_session):
-		if group_session:
-			return CommentSerializer(group_session.get_comments(), many=True).data
-		return None
+    # May be a cleaner way to get this relationship
+    # TODO: investigate
+    def get_comments(self, group_session):
+        if group_session:
+            return CommentSerializer(group_session.get_comments(), many=True).data
+        return None
 
-	def get_likes(self, group_session):
-		if group_session:
-			return group_session.like_set.all().count()
-		return None
+    def get_likes(self, group_session):
+        if group_session:
+            return group_session.like_set.all().count()
+        return None
 
-	def get_most_recent_clip_url(self, group_session):
-		if group_session:
-			clip = group_session.most_recent_clip()
-			if clip:
-				return clip.clip.url
-			return None
-		return None
+    def get_clips(self, group_session):
+        if group_session:
+            return ClipSerializer(group_session.clip_set.filter(session = group_session), many=True).data
+        return None
 
-	def get_most_recent_waveform_url(self, group_session):
-		if group_session:
-			clip = group_session.most_recent_clip()
-			if clip:
-				try:
-					return clip.waveform_image.url
-				except ValueError:
-					return None
-			return None
-		return None
+    def get_most_recent_clip_url(self, group_session):
+        if group_session:
+            clip = group_session.most_recent_clip()
+            if clip:
+                return clip.clip.url
+            return None
+        return None
 
-	# crowd = CrowdSerializer()
-	session_creator = ProfileSerializerNoFriends()
-	session_receiver = ProfileSerializerNoFriends()
-	comments = serializers.SerializerMethodField('get_comments')
-	likes = serializers.SerializerMethodField('get_likes')
-	clip_url = serializers.SerializerMethodField('get_most_recent_clip_url')
-	waveform_url = serializers.SerializerMethodField('get_most_recent_waveform_url')
+    def get_most_recent_waveform_url(self, group_session):
+        if group_session:
+            clip = group_session.most_recent_clip()
+            if clip:
+                try:
+                    return clip.waveform_image.url
+                except ValueError:
+                    return None
+            return None
+        return None
 
-	class Meta:
-		model = GroupSession
-		fields = (
-			'id',
-			'title',
-			'session_creator',
-			'session_receiver',
-			'is_complete',
-			'comments',
-			# 'is_battle',
-			'likes',
-			'clip_url',
-			'waveform_url',
-			'created_at',
-			'modified_at'
-		)
+    # crowd = CrowdSerializer()
+    session_creator = ProfileSerializerNoFriends()
+    session_receiver = ProfileSerializerNoFriends()
+    beat = BeatSerializer()
+    clips = serializers.SerializerMethodField('get_clips')
+    comments = serializers.SerializerMethodField('get_comments')
+    likes = serializers.SerializerMethodField('get_likes')
+    # clip_url = serializers.SerializerMethodField('get_most_recent_clip_url')
+    # waveform_url = serializers.SerializerMethodField('get_most_recent_waveform_url')
+
+    class Meta:
+        model = GroupSession
+        fields = (
+            'id',
+            'title',
+            'creator',
+            'is_complete',
+            'visibility',
+            'comments',
+            'clips',
+            'beat',
+            # 'is_battle',
+            'likes',
+            # 'clip_url',
+            # 'waveform_url',
+            'created_at',
+            'modified_at'
+        )
 
 class GroupSessionSerializerUnkownStatus(serializers.ModelSerializer):
 
-	def get_comments(self, group_session):
-			if group_session:
-				return CommentSerializer(group_session.get_comments(), many=True).data
-			return None
+    def get_comments(self, group_session):
+            if group_session:
+                return CommentSerializer(group_session.get_comments(), many=True).data
+            return None
 
-	def get_likes(self, group_session):
-		if group_session:
-			return group_session.like_set.all().count()
-		return None
+    def get_likes(self, group_session):
+        if group_session:
+            return group_session.like_set.all().count()
+        return None
 
-	def get_most_recent_clip_url(self, group_session):
-		if group_session:
-			clip = group_session.most_recent_clip()
-			if clip:
-				return clip.clip.url
-			return None
-		return None
+    def get_most_recent_clip_url(self, group_session):
+        if group_session:
+            clip = group_session.most_recent_clip()
+            if clip:
+                return clip.clip.url
+            return None
+        return None
 
-	def get_most_recent_waveform_url(self, group_session):
-		if group_session:
-			clip = group_session.most_recent_clip()
-			if clip:
-				try:
-					return clip.waveform_image.url
-				except ValueError:
-					return None
-			return None
-		return None
+    def get_most_recent_waveform_url(self, group_session):
+        if group_session:
+            clip = group_session.most_recent_clip()
+            if clip:
+                try:
+                    return clip.waveform_image.url
+                except ValueError:
+                    return None
+            return None
+        return None
 
-	def get_clips(self, group_session):
-		if group_session:
-			clips = group_session.get_clips()
-			return ClipSerializer(clips, many=True).data
-		return None
+    def get_clips(self, group_session):
+        if group_session:
+            clips = group_session.get_clips()
+            return ClipSerializer(clips, many=True).data
+        return None
 
-	# crowd = CrowdSerializer()
-	comments = serializers.SerializerMethodField('get_comments')
-	clip_url = serializers.SerializerMethodField('get_most_recent_clip_url')
-	waveform_url = serializers.SerializerMethodField('get_most_recent_waveform_url')
-	likes = serializers.SerializerMethodField('get_likes')
-	clips = serializers.SerializerMethodField('get_clips')
+    # crowd = CrowdSerializer()
+    comments = serializers.SerializerMethodField('get_comments')
+    clip_url = serializers.SerializerMethodField('get_most_recent_clip_url')
+    waveform_url = serializers.SerializerMethodField('get_most_recent_waveform_url')
+    likes = serializers.SerializerMethodField('get_likes')
+    clips = serializers.SerializerMethodField('get_clips')
 
-	class Meta:
-		model = GroupSession
-		fields = (
-			'id',
-			'title',
-			'is_complete',
-			'comments',
-			'likes',
-			'clips',
-			'created_at',
-			'modified_at'
-		)
+    class Meta:
+        model = GroupSession
+        fields = (
+            'id',
+            'title',
+            'is_complete',
+            'comments',
+            'likes',
+            'clips',
+            'created_at',
+            'modified_at'
+        )
 
 class CompletedGroupSessionSerializer(serializers.ModelSerializer):
 
-	def get_comments(self, group_session):
-		if group_session:
-			return CommentSerializer(group_session.get_comments(), many=True).data
-		return None
+    def get_comments(self, group_session):
+        if group_session:
+            return CommentSerializer(group_session.get_comments(), many=True).data
+        return None
 
-	def get_likes(self, group_session):
-		if group_session:
-			return group_session.like_set.all().count()
-		return None
+    def get_likes(self, group_session):
+        if group_session:
+            return group_session.like_set.all().count()
+        return None
 
-	def get_most_recent_clip_url(self, group_session):
-		if group_session:
-			clip = group_session.most_recent_clip()
-			if clip:
-				return clip.clip.url
-			return None
-		return None
+    def get_most_recent_clip_url(self, group_session):
+        if group_session:
+            clip = group_session.most_recent_clip()
+            if clip:
+                return clip.clip.url
+            return None
+        return None
 
-	def get_clips(self, group_session):
-		if group_session:
-			clips = group_session.get_clips()
-			return ClipSerializer(clips, many=True).data
-		return None
+    def get_clips(self, group_session):
+        if group_session:
+            clips = group_session.get_clips()
+            return ClipSerializer(clips, many=True).data
+        return None
 
-	def vote_count(self, group_session):
-		if group_session.is_battle:
-			votes = group_session.get_vote_count()
-			return { 'votes_for_creator': votes[0], 'votes_for_receiver': votes[1] }
-		return None
+    def vote_count(self, group_session):
+        if group_session.is_battle:
+            votes = group_session.get_vote_count()
+            return { 'votes_for_creator': votes[0], 'votes_for_receiver': votes[1] }
+        return None
 
-	creator = ProfileSerializerNoFriends()
-	receiver = ProfileSerializerNoFriends()
-	comments = serializers.SerializerMethodField('get_comments')
-	likes = serializers.SerializerMethodField('get_likes')
-	clips = serializers.SerializerMethodField('get_clips')
-	votes = serializers.SerializerMethodField('vote_count')
+    creator = ProfileSerializerNoFriends()
+    receiver = ProfileSerializerNoFriends()
+    comments = serializers.SerializerMethodField('get_comments')
+    likes = serializers.SerializerMethodField('get_likes')
+    clips = serializers.SerializerMethodField('get_clips')
+    votes = serializers.SerializerMethodField('vote_count')
 
-	class Meta:
-		model = GroupSession
-		fields = (
-			'id',
-			'title',
-			'is_complete',
-			'is_battle',
-			'creator',
-			'receiver',
-			'votes',
-			'comments',
-			'likes',
-			'clips',
-			'created_at',
-			'modified_at'
-		)
+    class Meta:
+        model = GroupSession
+        fields = (
+            'id',
+            'title',
+            'is_complete',
+            'is_battle',
+            'creator',
+            'receiver',
+            'votes',
+            'comments',
+            'likes',
+            'clips',
+            'created_at',
+            'modified_at'
+        )
 
 
 class PaginatedGroupSessionSerializer(pagination.PaginationSerializer):
-	'''
-	Serializes page objects of query sets
-	'''
-	class Meta:
-		object_serializer_class = GroupSessionSerializer
+    '''
+    Serializes page objects of query sets
+    '''
+    class Meta:
+        object_serializer_class = GroupSessionSerializer
 
 class PaginatedCompletedGroupSessionSerializer(pagination.PaginationSerializer):
-	class Meta:
-		object_serializer_class = CompletedGroupSessionSerializer
+    class Meta:
+        object_serializer_class = CompletedGroupSessionSerializer
 
 class ClipSerializer(serializers.ModelSerializer):
 
-	def get_url(self, clip):
-		return clip.clip.url
+    def get_url(self, clip):
+        return clip.clip.url
 
-	def get_waveform_url(self, clip):
-		if clip.waveform:
-			return clip.waveform_image.url if clip.waveform_image.url else None
-		return None
+    def get_waveform_url(self, clip):
+        if clip.waveform_image:
+            return clip.waveform_image.url if clip.waveform_image.url else None
+        return None
 
-	url = serializers.SerializerMethodField('get_url')
-	waveform_url = serializers.SerializerMethodField('get_waveform_url')
+    creator = ProfileSerializerNoFriends()
+    clip_url = serializers.SerializerMethodField('get_url')
+    waveform_url = serializers.SerializerMethodField('get_waveform_url')
 
-	class Meta:
-		model = Clip
-		fields = (
-			'id',
-			'clip',
-			'waveform_url',
-			'url',
-			'clip_num',
-			'creator',
-			'session',
-			'created_at',
-			'modified_at'
-		)
+    class Meta:
+        model = Clip
+        fields = (
+            'id',
+            'clip',
+            'creator',
+            'waveform_url',
+            'clip_url',
+            'start_time',
+            'end_time',
+            'times_played',
+            'clip_num',
+            'creator',
+            'session',
+            'created_at',
+            'modified_at'
+        )
 
 class LikeSerializer(serializers.ModelSerializer):
 
-	user = ProfileSerializer()
-	session = GroupSessionSerializer()
-	username = serializers.Field(source='user.username')
+    user = ProfileSerializer()
+    session = GroupSessionSerializer()
+    username = serializers.Field(source='user.username')
 
-	class Meta:
-		model = Like
-		fields = (
-			'id',
-			'username',
-			'session',
-			'created_at',
-			'modified_at'
-		)
+    class Meta:
+        model = Like
+        fields = (
+            'id',
+            'username',
+            'session',
+            'created_at',
+            'modified_at'
+        )
 
 ######################################################################
 #  Public Profile Serializer
@@ -452,33 +435,33 @@ class LikeSerializer(serializers.ModelSerializer):
 
 class PublicProfileSerializer(serializers.ModelSerializer):
 
-	# user = UserSerializer()
-	friends = ProfileSerializerNoFriends(many=True)
-	num_likes = serializers.Field(source='get_num_likes')
-	num_friends = serializers.Field(source='get_num_friends')
-	num_raps = serializers.Field(source='get_num_raps')
+    # user = UserSerializer()
+    friends = ProfileSerializerNoFriends(many=True)
+    num_likes = serializers.Field(source='get_num_likes')
+    num_friends = serializers.Field(source='get_num_friends')
+    num_raps = serializers.Field(source='get_num_raps')
 
-	def get_profile_picture_url(self, profile):
-		if profile.profile_picture:
-			return profile.profile_picture.url if profile.profile_picture.url else None
-		return None
+    def get_profile_picture_url(self, profile):
+        if profile.profile_picture:
+            return profile.profile_picture.url if profile.profile_picture.url else None
+        return None
 
-	profile_picture = serializers.SerializerMethodField('get_profile_picture_url')
+    profile_picture = serializers.SerializerMethodField('get_profile_picture_url')
 
-	class Meta:
-		model = Profile
-		fields = (
-			'id',
-			# 'user',
-			'username',
-			'first_name',
-			'last_name',
-			'friends',
-			'profile_picture',
-			'num_likes',
-			'num_friends',
-			'num_raps'
-			)
+    class Meta:
+        model = Profile
+        fields = (
+            'id',
+            # 'user',
+            'username',
+            'first_name',
+            'last_name',
+            'friends',
+            'profile_picture',
+            'num_likes',
+            'num_friends',
+            'num_raps'
+            )
 
 #######################################################################
 #   Vote Serializers
