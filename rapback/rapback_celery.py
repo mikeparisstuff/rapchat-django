@@ -18,7 +18,7 @@ app.conf.update(
 app.config_from_object('django.conf:settings')
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
-@app.task()
+@app.task(name='rapback.rapback_celery.add')
 def add(x, y):
     print 'Working on add task'
     return x+y
