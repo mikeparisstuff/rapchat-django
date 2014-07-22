@@ -31,6 +31,8 @@ def deploy():
             run("git clone git@github.com:mlp5ab/rapchat-django.git %s" % code_dir)
     with cd(code_dir):
         run("git pull")
+        run("workon rapback")
+        run("pip install -r requirements.txt")
         run("touch app.wsgi")
 
 def run_debug():
