@@ -1,7 +1,8 @@
 from fabric.api import *
 from fabric.contrib.console import confirm
 
-env.hosts = ['rapback_web']
+env.use_ssh_config = True
+env.hosts = ['rapback']
 
 def test():
     with settings(warn_only=True):
@@ -10,7 +11,7 @@ def test():
         abort("Aborting at user request.")
 
 def commit(message):
-    local('git add -p && git commit -m %s' % message)
+    local('''git add -p && git commit -m %s''' % message)
 
 def push():
     local('git push origin')
