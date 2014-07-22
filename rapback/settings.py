@@ -57,7 +57,7 @@ elif INSTANCE_ID == 'HEROKU':
     DATABASES = {
         'default': dj_database_url.config()
     }
-elif INSTANCE_ID == 'Prod' :
+elif INSTANCE_ID == 'PROD' :
     DATABASES = {
     'default': {
       'ENGINE': 'django.db.backends.postgresql_psycopg2',

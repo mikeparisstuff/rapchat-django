@@ -35,6 +35,10 @@ def deploy():
         run("workon rapback")
         run("touch app.wsgi")
 
+def full_deploy(message):
+    prepare_deploy(message)
+    deploy()
+
 def migrate():
     with cd(code_dir):
         run("workon rapback && python manage.py migrate")
