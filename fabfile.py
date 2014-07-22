@@ -21,4 +21,4 @@ def prepare_deploy():
     push()
 
 def deploy():
-    code_dir = "/"
+    code_dir = "~/rapback"
