@@ -1,16 +1,15 @@
 from django.contrib import admin
 from django.db import models
 
-from groupsessions.models import GroupSession, Clip, Like, BattleVote
+from groupsessions.models import GroupSession, Clip, Like, Beat
 
 class GroupSessionAdmin(admin.ModelAdmin):
 
 	list_display = (
 		'id',
 		'title',
-		'is_private',
 		'is_complete',
-		'created'
+		'created_at'
 	)
 
 class ClipAdmin(admin.ModelAdmin):
@@ -26,17 +25,24 @@ class LikeAdmin(admin.ModelAdmin):
 		'id',
 		'user',
 		'session',
-		'created'
+		'created_at'
 	)
 
-class BattleVoteAdmin(admin.ModelAdmin):
-	list_display = (
-		'id',
-		'battle',
-		'is_for_creator'
-	)
+class BeatAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'title'
+    )
+
+# class BattleVoteAdmin(admin.ModelAdmin):
+# 	list_display = (
+# 		'id',
+# 		'battle',
+# 		'is_for_creator'
+# 	)
 
 admin.site.register(GroupSession, GroupSessionAdmin)
 admin.site.register(Clip, ClipAdmin)
 admin.site.register(Like, LikeAdmin)
-admin.site.register(BattleVote, BattleVoteAdmin)
+admin.site.register(Beat, BeatAdmin)
+# admin.site.register(BattleVote, BattleVoteAdmin)

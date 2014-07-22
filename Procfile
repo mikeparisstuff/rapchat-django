@@ -1,1 +1,1 @@
-web: gunicorn rapchat.wsgi
+web: gunicorn rapback.wsgi

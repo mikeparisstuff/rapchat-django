@@ -6,7 +6,7 @@ from feedback.models import FeedbackMessage
 class FeedbackMessageAdmin(admin.ModelAdmin):
 	list_display = (
 		'creator',
-		'created',
+		'created_at',
 		'was_read'
 	)
 

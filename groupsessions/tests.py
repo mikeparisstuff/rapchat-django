@@ -9,16 +9,17 @@ class TestGroupSessions(APITestCase):
 	fixtures = ['test_fixtures.json']
 
 	def setUp(self):
-		token = Token.objects.get(user__username='DeerDoe')
+		token = Token.objects.get(username='DeerDoe')
 		self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
 		self.client.content_type = 'application/json'
 
-	def test_create_session_valid_info(self):
+	def test_create_public_session_valid_info(self):
 		data = {
 			'title': 'Rap Session Title',
-			'use_existing_crowd': True,
-			'crowd': 1
-		}		
+			'is_private': False,
+			'clip': ''
+
+		}
 		res = self.client.post(
 			'/sessions/',
 			data=data
