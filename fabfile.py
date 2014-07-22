@@ -2,7 +2,7 @@ from fabric.api import *
 from fabric.contrib.console import confirm
 
 env.use_ssh_config = True
-env.hosts = ['rapback']
+env.hosts = ['rapback_web']
 
 def test():
     with settings(warn_only=True):
@@ -25,10 +25,15 @@ def prepare_deploy(message):
     push()
 
 def deploy():
-    code_dir = "~/rapback-web"
+    code_dir = "~/rapback"
     with settings(warn_only=True):
         if run("test -d %s" % code_dir).failed:
             run("git clone git@github.com:mlp5ab/rapchat-django.git %s" % code_dir)
     with cd(code_dir):
         run("git pull")
         run("touch app.wsgi")
+
+def run_debug():
+    code_dir = "~/rapback"
+    with cd(code_dir):
+        run("python manage.py runserver 0.0.0.0:8000")
