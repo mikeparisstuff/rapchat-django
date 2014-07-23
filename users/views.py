@@ -11,11 +11,12 @@ from users.models import Profile, FriendRequest
 from rapback.serializers import ProfileSerializer, FriendRequestSerializer, ProfileSerializerNoFriends, MyProfileSerializer, PublicProfileSerializer, LikeSerializer
 # , LikeSerializerNoMembers
 from core.api import AuthenticatedView, UnauthenticatedView
-
+from rapback.rapback_celery import add
 
 
 class WelcomePage(APIView):
     def get(self, request, format=None):
+        add.delay(5,5)
         return Response('Welcome to the Rapchat API.  Goto /api-docs/ for more details.')
 
 class HandleProfiles(APIView):

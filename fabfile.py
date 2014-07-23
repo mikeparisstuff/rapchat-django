@@ -30,7 +30,7 @@ def prepare_deploy(message):
     commit(message)
     push()
 
-@roles('web')
+@roles('web', 'celery')
 def deploy():
     with settings(warn_only=True):
         if run("test -d %s" % code_dir).failed:
