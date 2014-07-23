@@ -6,7 +6,7 @@ from celery import Celery
 settings.configure()
 
 app = Celery('rapback.celery',
-        broker='sqs://sqs.us-west-2.amazonaws.com/487142144782/rapback-rapsession-queue//'
+        broker='sqs://sqs.us-east-1.amazonaws.com/487142144782/rapback-celery-broker//'
         )
 
 app.conf.update(
