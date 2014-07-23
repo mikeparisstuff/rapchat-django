@@ -69,4 +69,4 @@ def setup_new_instance():
         run('sudo yum install gcc python-setuptools python-devel postgresql-devel')
     deploy()
     with cd(code_dir):
-        run('pip install -r requirements.txt')
+        run('workon rapback && pip install -r requirements.txt')
