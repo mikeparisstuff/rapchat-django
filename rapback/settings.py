@@ -124,7 +124,7 @@ INSTALLED_APPS = (
     'rest_framework.authtoken',
     'rest_framework_swagger',
     'django_extensions',
-
+    'gunicorn',
     # My apps
     'rapback',
     'users',
