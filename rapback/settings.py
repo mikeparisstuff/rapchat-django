@@ -69,6 +69,7 @@ elif INSTANCE_ID == 'PROD' :
             'PORT': os.environ['RDS_PORT'],                      # Set to empty string for default.
         }
     }
+    AWS_STORAGE_BUCKET_NAME = 'RapbackProd'
 elif INSTANCE_ID == 'PPE':
     DATABASES = {
         'default': {
