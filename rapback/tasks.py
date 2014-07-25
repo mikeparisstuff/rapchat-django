@@ -1,21 +1,23 @@
 __author__ = 'MichaelParis'
 
-from celery import shared_task
+from celery import task
 from django.conf import settings
 import redis
 
-@shared_task#(name='rapback.tasks.add')
+settings.configure()
+
+@task(name='rapback.tasks.add')
 def add(x, y):
     print 'Working on add task'
     return x+y
 
-@shared_task#(name='rapback.tasks.increment_page_hit_count')
+@task(name='rapback.tasks.increment_page_hit_count')
 def increment_page_hit_count():
     print 'Incrementing page hit count'
     r = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
     r.incr('page_hit_count')
 
-@shared_task#(name='rapback.tasks.add_to_feed')
+@task(name='rapback.tasks.add_to_feed')
 def add_session_to_feed(user_id, session_id):
     r = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
     key = 'feed:user:{}'.format(user_id)
