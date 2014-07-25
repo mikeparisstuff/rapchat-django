@@ -55,6 +55,10 @@ def run_debug():
     with cd(code_dir):
         run("python manage.py runserver 0.0.0.0:8000")
 
+@roles('celery')
+def restart_celery():
+    run("workon rapback && supervisord restart rapback")
+
 def setup_new_instance():
     with cd("~"):
         run('wget https://bootstrap.pypa.io/get-pip.py')

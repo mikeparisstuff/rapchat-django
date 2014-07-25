@@ -39,6 +39,11 @@ DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
 AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
 
+# Default to AWS creds. Won't be able to access without permissions
+REDIS_HOST = 'ec2-54-210-10-162.compute-1.amazonaws.com'
+REDIS_PORT = 6379
+REDIS_DB = 0
+
 if INSTANCE_ID == 'LOCAL_VAGRANT':
     DATABASES = {
         'default': {
@@ -52,6 +57,9 @@ if INSTANCE_ID == 'LOCAL_VAGRANT':
             'PORT': '',                      # Set to empty string for default.
         }
     }
+    REDIS_HOST = 'localhost'
+    REDIS_PORT = 6379
+    REDIS_DB = 0
     AWS_STORAGE_BUCKET_NAME = 'rapback-vagrantbucket'
 elif INSTANCE_ID == 'HEROKU':
     DATABASES = {
